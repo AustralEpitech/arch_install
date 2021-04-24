@@ -24,7 +24,7 @@ PACKAGES=(
 	pulseaudio-alsa
 	xorg
 	xorg-xinit
-	doas
+	opendoas
 	os-prober
 	linux-headers
 	alsa-utils

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-USER0=ange
+USER0=yann
 
-MYHOSTNAME=ANGE-DESKTOP
+MYHOSTNAME=YANN-DESKTOP
 
 ESP="/boot/efi"
 
@@ -34,7 +34,6 @@ PACKAGES=(
 	gimp
 	gparted
 	lutris
-	steam
 	neofetch
 	nvidia
 	nvidia-settings
@@ -49,10 +48,15 @@ PACKAGES=(
 	okular
 	plasma
 	sddm
+	konsole
+	gwenview
+	dolphin
 )
+echo steam
+systemctl enable sddm
 
 sed -i '92s/.//; 93s/.//' /etc/pacman.conf
-pacman -Syu --needed ${PACKAGES[@]}
+pacman -Syu --noconfirm --needed ${PACKAGES[@]}
 
 ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
 hwclock --systohc

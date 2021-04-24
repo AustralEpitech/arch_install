@@ -19,7 +19,6 @@ PACKAGES=(
 	ttf-dejavu
 	intel-ucode
 	htop
-	git
 	openssh
 	pulseaudio
 	pulseaudio-alsa
@@ -48,10 +47,12 @@ PACKAGES=(
 	wine-gecko
 	xclip
 	okular
+	plasma
+	sddm
 )
 
-sed '92s/.//; 93s/.//' /etc/pacman.conf
-pacman -Syu --needed $PACKAGES
+sed -i '92s/.//; 93s/.//' /etc/pacman.conf
+pacman -Syu --needed ${PACKAGES[@]}
 
 ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
 hwclock --systohc
@@ -62,7 +63,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "KEYMAP=fr-latin1" > /etc/vconsole.conf
 
 echo $MYHOSTNAME > /etc/hostname
-echo -e "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t$MYHOSTNAME.localdomain\t$MYHOSTNAME"
+echo -e "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t$MYHOSTNAME.localdomain\t$MYHOSTNAME" >> /etc/hosts
 
 systemctl enable NetworkManager
 

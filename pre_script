@@ -1,8 +1,8 @@
 #!/bin/bash
 
-USER0=yann
+USER0=ange
 
-MYHOSTNAME=YANN-DESKTOP
+MYHOSTNAME=ange-DESKTOP
 
 ESP="/boot/efi"
 
@@ -46,14 +46,8 @@ PACKAGES=(
 	wine-gecko
 	xclip
 	okular
-	plasma
-	sddm
-	konsole
-	gwenview
-	dolphin
+	steam
 )
-echo steam
-systemctl enable sddm
 
 sed -i '92s/.//; 93s/.//' /etc/pacman.conf
 pacman -Syu --noconfirm --needed ${PACKAGES[@]}
@@ -84,17 +78,19 @@ passwd $USER0
 
 echo -e "permit :wheel\npermit persist :wheel" > /etc/doas.conf
 
-echo "Section "InputClass"
+echo 'Section "InputClass"
         Identifier "system-keyboard"
         MatchIsKeyboard "on"
         Option "XkbLayout" "fr,us"
         Option "XkbVariant" "azerty,"
         Option "XkbOptions" "grp:alt_shift_toggle"
-EndSection" > /etc/X11/xorg.conf.d/00-keyboard.conf
+EndSection' > /etc/X11/xorg.conf.d/00-keyboard.conf
 
-echo "Section "InputClass"
+echo 'Section "InputClass"
 	Identifier "My Mouse"
 	Driver "libinput"
 	MatchIsPointer "yes"
 	Option "AccelProfile" "flat"
-EndSection" > /etc/X11/xorg.conf.d/50-mouse-acceleration.conf
+EndSection' > /etc/X11/xorg.conf.d/50-mouse-acceleration.conf
+
+modprobe vboxdrv

@@ -1,0 +1,95 @@
+#!/bin/bash
+
+USER0=ange
+
+MYHOSTNAME=ANGE-DESKTOP
+
+ESP="/boot/efi"
+
+PACKAGES=(
+	networkmanager
+	grub
+	efibootmgr
+	man-pages
+	man-db
+	texinfo
+	noto-fonts
+	noto-fonts-cjk
+	noto-fonts-emoji
+	ttf-dejavu
+	intel-ucode
+	htop
+	git
+	openssh
+	pulseaudio
+	pulseaudio-alsa
+	xorg
+	xorg-xinit
+	doas
+	os-prober
+	linux-headers
+	alsa-utils
+	base-devel
+	ntfs-3g
+	discord
+	gimp
+	gparted
+	lutris
+	steam
+	neofetch
+	nvidia
+	nvidia-settings
+	obs-studio
+	tree
+	unrar
+	virtualbox
+	wine-staging
+	wine-mono
+	wine-gecko
+	xclip
+	okular
+)
+
+sed '92s/.//; 93s/.//' /etc/pacman.conf
+pacman -Syu --needed $PACKAGES
+
+ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+hwclock --systohc
+
+sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g; s/#fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/g" /etc/locale.gen
+locale-gen
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+echo "KEYMAP=fr-latin1" > /etc/vconsole.conf
+
+echo $MYHOSTNAME > /etc/hostname
+echo -e "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t$MYHOSTNAME.localdomain\t$MYHOSTNAME"
+
+systemctl enable NetworkManager
+
+grub-install --target=x86_64-efi --efi-directory=$ESP --bootloader-id=GRUB
+grub-mkconfig -o /boot/grub/grub.cfg
+
+echo "root passwd"
+passwd
+
+useradd -m -G wheel $USER0
+
+echo "$USER0 passwd"
+passwd $USER0
+
+echo -e "permit :wheel\npermit persist :wheel" > /etc/doas.conf
+
+echo "Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "fr,us"
+        Option "XkbVariant" "azerty,"
+        Option "XkbOptions" "grp:alt_shift_toggle"
+EndSection" > /etc/X11/xorg.conf.d/00-keyboard.conf
+
+echo "Section "InputClass"
+	Identifier "My Mouse"
+	Driver "libinput"
+	MatchIsPointer "yes"
+	Option "AccelProfile" "flat"
+EndSection" > /etc/X11/xorg.conf.d/50-mouse-acceleration.conf

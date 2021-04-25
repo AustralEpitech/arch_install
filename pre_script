@@ -102,5 +102,4 @@ echo \
 EndSection' > /etc/X11/xorg.conf.d/50-mouse-acceleration.conf
 
 systemctl enable NetworkManager
-modprobe vboxdrv
 nvidia-xconfig

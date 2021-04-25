@@ -6,6 +6,8 @@ PACKAGES=(
     speed-test
 )
 
+modprobe vboxdrv
+
 git clone https://aur.archlinux.org/paru-bin.git
 cd paru-bin
 makepkg -si

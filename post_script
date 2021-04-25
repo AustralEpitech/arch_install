@@ -1,4 +1,12 @@
+#!/usr/bin/bash
+
+PACKAGES=(
+    brave-bin
+    criterion
+    speed-test
+)
+
 git clone https://aur.archlinux.org/paru-bin.git
 cd paru-bin
 makepkg -si
-paru -S brave-bin
+paru -S --needed ${PACKAGES[@]}

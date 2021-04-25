@@ -9,6 +9,7 @@ ESP="/boot/efi"
 PACKAGES=(
 	alacritty
 	alsa-utils
+	base-devel
 	clang
 	cmatrix
 	code
@@ -46,7 +47,7 @@ PACKAGES=(
 	ttf-dejavu
 	unrar
 	valgrind
-	virtualbox
+	virtualbox{,-host-modules-arch}
 	wget
 	wine-{gecko,mono,staging}
 	winetricks

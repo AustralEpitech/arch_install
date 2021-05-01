@@ -102,3 +102,7 @@ EndSection' > /etc/X11/xorg.conf.d/50-mouse-acceleration.conf
 
 systemctl enable NetworkManager
 nvidia-xconfig
+
+chown $USER0:$USER0 post_script
+mv post_script /home/$USER0/
+rm -r $(pwd)

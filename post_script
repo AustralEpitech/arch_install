@@ -15,12 +15,7 @@ TECH_PACKAGES=(
     valgrind
 )
 
-if [ $EUID != 0 ]; then
-    echo "Rerun as root"
-    exit 1
-fi
-
-modprobe vboxdrv
+sudo modprobe vboxdrv
 
 git clone https://aur.archlinux.org/paru-bin.git
 cd paru-bin
@@ -48,5 +43,5 @@ FONTS=(
 )
 
 for FONT in ${FONTS[@]}; do
-    wget --directory-prefix="/usr/share/fonts/TTF" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20$FONT.ttf
+    sudo wget --directory-prefix="/usr/share/fonts/TTF" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20$FONT.ttf
 done

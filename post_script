@@ -2,8 +2,17 @@
 
 PACKAGES=(
     brave-bin
-    criterion
     speed-test
+)
+
+TECH_PACKAGES=(
+    csfml
+    criterion
+    docker
+    emacs
+    gcovr
+    gdb
+    valgrind
 )
 
 modprobe vboxdrv
@@ -13,8 +22,26 @@ cd paru-bin
 makepkg -si
 cd ..
 rm -rf paru-bin
-paru -S --needed ${PACKAGES[@]}
 
+paru -Syyu --noconfirm --needed ${PACKAGES[@]}
+paru -S --needed ${TECH_PACKAGES[@]}
+
+# Oh My Zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 echo -e "alias pls='sudo'\nalias -g G='|grep -i'" >> ~/.zshrc
+
+# Powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+
+sed -i 's ZSH_THEME="robbyrussell" ZSH_THEME="powerlevel10k/powerlevel10k" g' ~/.zshrc
+
+FONTS=(
+    Regular
+    Bold{,%20Italic}
+    Italic
+)
+
+for FONT in ${FONTS[@]}; do
+    wget --directory-prefix="/usr/share/fonts/TTF" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20$FONT.ttf
+done

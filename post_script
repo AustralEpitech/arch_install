@@ -15,6 +15,11 @@ TECH_PACKAGES=(
     valgrind
 )
 
+if [ $EUID != 0 ]; then
+    echo "Rerun as root"
+    exit 1
+fi
+
 modprobe vboxdrv
 
 git clone https://aur.archlinux.org/paru-bin.git

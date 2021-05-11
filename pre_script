@@ -28,7 +28,7 @@ PACKAGES=(
     pipewire{,-{alsa,pulse}}
     tree
     unrar
-    virt-manager qemu iptables-nft dnsmasq 
+    virt-manager qemu iptables-nft dnsmasq edk2-ovmf
     wget
     xclip
     xorg{,-xinit} xdotool

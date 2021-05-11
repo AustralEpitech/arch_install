@@ -8,44 +8,30 @@ ESP="/boot/efi"
 
 PACKAGES=(
     alacritty
-    base-devel
-    clang
-    cmake
+    base-devel clang cmake python{,-pip}
     code
     discord
-    efibootmgr
-    gimp
+    gimp gwenview okular obs-studio
     git
-    gparted
-    grub
-    gwenview
+    gparted ntfs-3g
+    grub efibootmgr os-prober
     htop
-    intel-ucode
+    intel-ucode nvidia{,-settings}
     linux-headers
-    lutris
+    lutris steam wine-{gecko,mono,staging} winetricks
     man-{db,pages}
     nano
     neofetch
     networkmanager
-    noto-fonts{,-{cjk,emoji}}
-    ntfs-3g
-    nvidia{,-settings}
-    obs-studio
-    okular
+    noto-fonts{,-{cjk,emoji}} ttf-dejavu
     openssh
-    os-prober
     pipewire{,-{alsa,pulse}}
-    python{,-pip}
-    steam
     tree
-    ttf-dejavu
     unrar
+    virt-manager qemu iptables-nft dnsmasq 
     wget
-    wine-{gecko,mono,staging}
-    winetricks
     xclip
-    xdotool
-    xorg{,-xinit}
+    xorg{,-xinit} xdotool
     zsh
 )
 

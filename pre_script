@@ -58,6 +58,7 @@ pacman -Syyu --noconfirm --needed ${PACKAGES[@]}
 
 ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
 hwclock --systohc
+timedatectl set-ntp true
 
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g; s/#fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/g" /etc/locale.gen
 locale-gen

@@ -8,11 +8,9 @@ ESP="/boot/efi"
 
 PACKAGES=(
     alacritty
-    alsa-utils
     base-devel
     clang
     cmake
-    cmatrix
     code
     discord
     efibootmgr
@@ -36,14 +34,12 @@ PACKAGES=(
     okular
     openssh
     os-prober
-    pulseaudio{,-alsa}
+    pipewire{,-{alsa,pulse}}
     python{,-pip}
-    sl
     steam
     tree
     ttf-dejavu
     unrar
-    virtualbox{,-host-modules-arch}
     wget
     wine-{gecko,mono,staging}
     winetricks

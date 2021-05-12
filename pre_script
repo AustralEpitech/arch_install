@@ -19,7 +19,7 @@ PACKAGES=(
     intel-ucode nvidia{,-settings}
     linux-headers
     lutris steam wine-{gecko,mono,staging} winetricks
-    man-{db,pages}
+    man-{db,pages} texinfo
     nano
     neofetch
     networkmanager
@@ -28,7 +28,7 @@ PACKAGES=(
     pipewire{,-{alsa,pulse}}
     tree
     unrar
-    virt-manager qemu iptables-nft dnsmasq edk2-ovmf
+    virt-manager qemu iptables-nft dnsmasq
     wget
     xclip
     xorg{,-xinit} xdotool

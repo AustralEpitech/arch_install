@@ -2,27 +2,25 @@
 
 PACKAGES=(
     brave-bin
-    speed-test
 )
 
 TECH_PACKAGES=(
     csfml
     criterion
     docker
-    emacs
     gcovr
     gdb
     valgrind
 )
 
 git clone https://aur.archlinux.org/paru-bin.git
-cd paru-bin
+cd paru-bin || exit
 makepkg -si --noconfirm
-cd ..
+cd .. || exit
 rm -rf paru-bin
 
-paru -Syyu --noconfirm --needed ${PACKAGES[@]}
-paru -S --needed ${TECH_PACKAGES[@]}
+paru -Syyu --noconfirm --needed "${PACKAGES[@]}"
+paru -S --needed "${TECH_PACKAGES[@]}"
 
 # Oh My Zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -30,7 +28,7 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 echo -e "alias pls='sudo'\nalias -g G='|grep -i'" >> ~/.zshrc
 
 # Powerlevel10k
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"/themes/powerlevel10k
 
 sed -i 's ZSH_THEME="robbyrussell" ZSH_THEME="powerlevel10k/powerlevel10k" g' ~/.zshrc
 
@@ -40,6 +38,6 @@ FONTS=(
     Italic
 )
 
-for FONT in ${FONTS[@]}; do
-    sudo wget --directory-prefix="/usr/share/fonts/TTF" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20$FONT.ttf
+for FONT in "${FONTS[@]}"; do
+    sudo wget --directory-prefix="/usr/share/fonts/TTF" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20"$FONT".ttf
 done

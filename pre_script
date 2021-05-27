@@ -1,10 +1,8 @@
 #!/usr/bin/bash
 
-USER0=ange
-
-MYHOSTNAME=${USER0^^}-DESKTOP
-
-ESP="/boot/efi"
+USER0="ange"
+MYHOSTNAME="${USER0^^}-DESKTOP"
+CONFIG_DIR="config"
 
 PACKAGES=(
     alacritty
@@ -14,13 +12,12 @@ PACKAGES=(
     gimp gwenview okular obs-studio
     git
     gparted ntfs-3g
-    grub efibootmgr os-prober
     htop
     intel-ucode nvidia{,-settings}
+    kdenlive
     linux-headers
     lutris steam wine-{gecko,mono,staging} winetricks
     man-{db,pages} texinfo
-    nano
     neofetch
     networkmanager
     noto-fonts{,-{cjk,emoji}} ttf-dejavu
@@ -28,14 +25,15 @@ PACKAGES=(
     pipewire{,-{alsa,pulse}}
     tree
     unrar
+    vim
     wget
     xclip
-    xorg{,-xinit} xdotool
+    xorg{,-xinit}
     zsh
 )
 
 sed -i "92s/.//; 93s/.//" /etc/pacman.conf
-pacman -Syyu --noconfirm --needed ${PACKAGES[@]}
+pacman -Syyu --noconfirm --needed "${PACKAGES[@]}"
 
 ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
 hwclock --systohc
@@ -46,14 +44,13 @@ locale-gen
 echo "LANG=C" > /etc/locale.conf
 echo "KEYMAP=fr-latin1" > /etc/vconsole.conf
 
-echo $MYHOSTNAME > /etc/hostname
+echo "$MYHOSTNAME" > /etc/hostname
 echo \
-"127.0.0.1	localhost
-::1		localhost
-127.0.1.1	$MYHOSTNAME.localdomain	$MYHOSTNAME" >> /etc/hosts
+"127.0.0.1  localhost
+::1         localhost
+127.0.1.1   $MYHOSTNAME.localdomain $MYHOSTNAME" >> /etc/hosts
 
-grub-install --target=x86_64-efi --efi-directory=$ESP --bootloader-id=GRUB
-grub-mkconfig -o /boot/grub/grub.cfg
+bootctl install
 
 echo -e "\nroot passwd"
 passwd
@@ -65,26 +62,13 @@ passwd $USER0
 
 sed -i "s/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/" /etc/sudoers
 
-echo \
-'Section "InputClass"
-	Identifier "keyboard"
-	MatchIsKeyboard "on"
-	Option "XkbLayout" "fr,us"
-	Option "XkbVariant" "azerty,"
-	Option "XkbOptions" "grp:alt_shift_toggle"
-EndSection' > /etc/X11/xorg.conf.d/00-keyboard.conf
-
-echo \
-'Section "InputClass"
-	Identifier "mouse"
-	Driver "libinput"
-	MatchIsPointer "yes"
-	Option "AccelProfile" "flat"
-EndSection' > /etc/X11/xorg.conf.d/50-mouse-acceleration.conf
+cp -rf "$CONFIG_DIR"/xorg.conf.d/* /etc/X11/xorg.conf.d/
+cp -rf "$CONFIG_DIR"/hooks /etc/pacman.d/
+cp -rf "$CONFIG_DIR"/loader/* /boot/
 
 systemctl enable NetworkManager
 nvidia-xconfig
 
 chown $USER0:$USER0 post_script
 mv post_script /home/$USER0/
-rm -r $(pwd)
+rm -r "$(pwd)"

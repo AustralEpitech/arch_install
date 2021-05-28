@@ -2,7 +2,7 @@
 
 USER0="ange"
 MYHOSTNAME="${USER0^^}-DESKTOP"
-CONFIG_DIR="config"
+SYS_CONFIG_DIR="config/system"
 
 PACKAGES=(
     alacritty
@@ -62,13 +62,9 @@ passwd $USER0
 
 sed -i "s/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/" /etc/sudoers
 
-cp -rf "$CONFIG_DIR"/xorg.conf.d/* /etc/X11/xorg.conf.d/
-cp -rf "$CONFIG_DIR"/hooks /etc/pacman.d/
-cp -rf "$CONFIG_DIR"/loader/* /boot/
+cp -rf "$SYS_CONFIG_DIR"/xorg.conf.d/* /etc/X11/xorg.conf.d/
+cp -rf "$SYS_CONFIG_DIR"/hooks /etc/pacman.d/
+cp -rf "$SYS_CONFIG_DIR"/loader/* /boot/
 
 systemctl enable NetworkManager
 nvidia-xconfig
-
-chown $USER0:$USER0 post_script
-mv post_script /home/$USER0/
-rm -r "$(pwd)"

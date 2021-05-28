@@ -2,6 +2,7 @@
 
 PACKAGES=(
     brave-bin
+    shellcheck-bin
 )
 
 TECH_PACKAGES=(

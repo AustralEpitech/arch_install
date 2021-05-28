@@ -99,7 +99,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias pls='doas'
+alias pls='sudo'
 alias -g G='|grep -i'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.

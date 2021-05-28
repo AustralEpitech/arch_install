@@ -54,7 +54,7 @@ editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 navigator = "brave"
 wallpaper = config_dir .. "wallpaper.png"
-lock = "i3lock -f -i" .. config_dir .. "lock.png"
+lock = "i3lock -fti" .. config_dir .. "lock.png"
 screenshot = "flameshot full -c"
 screenshot_gui = "flameshot gui"
 

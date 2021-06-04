@@ -20,9 +20,9 @@ PACKAGES=(
     man-{db,pages} texinfo
     neofetch
     networkmanager
-    noto-fonts{,-{cjk,emoji}} ttf-dejavu
+    noto-fonts{,-cjk,-emoji} ttf-dejavu
     openssh
-    pipewire{,-{alsa,pulse}}
+    pipewire{,-alsa,-pulse}
     tree
     unrar
     vim
@@ -32,7 +32,7 @@ PACKAGES=(
     zsh
 )
 
-sed -i "92s/.//; 93s/.//" /etc/pacman.conf
+cp -rf "$SYS_CONFIG_DIR"/etc /etc
 pacman -Syyu --noconfirm --needed "${PACKAGES[@]}"
 
 ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
@@ -62,9 +62,7 @@ passwd $USER0
 
 sed -i "s/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/" /etc/sudoers
 
-cp -rf "$SYS_CONFIG_DIR"/xorg.conf.d/* /etc/X11/xorg.conf.d/
-cp -rf "$SYS_CONFIG_DIR"/hooks /etc/pacman.d/
-cp -rf "$SYS_CONFIG_DIR"/loader/* /boot/
+cp -rf "$SYS_CONFIG_DIR"/loader /boot/
 
 systemctl enable NetworkManager
 nvidia-xconfig

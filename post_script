@@ -14,11 +14,9 @@ TECH_PACKAGES=(
     valgrind
 )
 
-git clone https://aur.archlinux.org/paru-bin.git
-cd paru-bin || exit
+git clone https://aur.archlinux.org/paru-bin.git /tmp
+cd /tmp/paru-bin || exit
 makepkg -si --noconfirm
-cd .. || exit
-rm -rf paru-bin
 
 paru -Syyu --noconfirm --needed "${PACKAGES[@]}"
 paru -S --needed "${TECH_PACKAGES[@]}"
@@ -42,3 +40,10 @@ FONTS=(
 for FONT in "${FONTS[@]}"; do
     sudo wget --directory-prefix="/usr/share/fonts/TTF" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20"$FONT".ttf
 done
+
+echo -e "\n\n\n\n
+    TODO
+
+    configure NVIDIA drm
+    Install WM
+"

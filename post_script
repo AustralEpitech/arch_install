@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 PACKAGES=(
     brave-bin
@@ -9,10 +9,14 @@ TECH_PACKAGES=(
     csfml
     criterion
     docker
+    emacs
     gcovr
     gdb
     valgrind
 )
+
+BOLD="\033[1m"
+NORMAL="\033[0m"
 
 git clone https://aur.archlinux.org/paru-bin.git /tmp
 cd /tmp/paru-bin || exit
@@ -41,9 +45,6 @@ for FONT in "${FONTS[@]}"; do
     sudo wget --directory-prefix="/usr/share/fonts/TTF" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20"$FONT".ttf
 done
 
-echo -e "\n\n\n\n
-    TODO
-
-    configure NVIDIA drm
-    Install WM
+echo -e "\n\n
+    ${BOLD}DONE${NORMAL}
 "

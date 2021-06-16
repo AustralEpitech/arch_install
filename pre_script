@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 USER0="ange"
 MYHOSTNAME="${USER0^^}-DESKTOP"
@@ -9,7 +9,7 @@ PACKAGES=(
     base-devel clang cmake python{,-pip}
     code
     discord
-    gimp gwenview okular obs-studio
+    gimp okular obs-studio
     git
     gparted ntfs-3g
     htop
@@ -66,3 +66,5 @@ cp -rf "$SYS_CONFIG_DIR"/loader /boot/
 
 systemctl enable NetworkManager
 nvidia-xconfig
+
+sed -i "s/MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/" /etc/mkinitcpio.conf

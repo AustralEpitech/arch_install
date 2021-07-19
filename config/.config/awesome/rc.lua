@@ -51,13 +51,13 @@ wallpaper_dir = config_dir .. "wallpapers/"
 
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 
-mytags = {"TTY", "WEB", "DEV", "FUN", "VM", "CHAT", "MED", "GFX", "ETC"}
+mytags = {"TTY", "WEB", "DEV", "CHAT", "VM", "GAM", "MED", "GFX", "ETC"}
 
 terminal = "alacritty"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 navigator = "brave"
-wallpaper = {"wow2.png", "wow1.png", "wow3.png"}
+wallpaper = {"landscape.png"}
 lock = "i3lock -fti" .. wallpaper_dir .. "lock.png"
 screenshot = "flameshot full -c"
 screenshot_gui = "flameshot gui"
@@ -462,6 +462,20 @@ globalkeys = gears.table.join(
             awful.spawn("pactl set-sink-mute 0 toggle")
         end,
         {description = "toggle mute", group = "hotkeys"}
+    ),
+    awful.key(
+        {"Control"}, "XF86AudioMute",
+        function()
+            awful.spawn("pactl set-source-mute 0 toggle")
+        end,
+        {description = "toggle mic mute", group = "hotkeys"}
+    ),
+    awful.key(
+        {"Control"}, "F6",
+        function()
+            awful.spawn.with_shell("~/bin/toggle_touchpad.sh")
+        end,
+        {description = "toggle touchpad", group = "hotkeys"}
     )
 )
 
@@ -475,7 +489,7 @@ clientkeys = gears.table.join(
         {description = "toggle fullscreen", group = "client"}
     ),
     awful.key(
-        {modkey}, "w",
+        {modkey, "Shift"}, "c",
         function(c)
             c:kill()
         end,
@@ -641,34 +655,13 @@ awful.rules.rules = {
         properties = {floating = true}
     },
 
-    {
-        rule_any = {class = {"Brave-browser"}},
-        properties = {tag = mytags[2], switch_to_tags = true}
-    },
-    {
-        rule_any = {class = {"code-oss"}},
-        properties = {tag = mytags[3], switch_to_tags = true}
-    },
-    {
-        rule_any = {class = {"Steam", "lutris"}},
-        properties = {tag = mytags[4], switch_to_tags = true}
-    },
-    {
-        rule_any = {class = {"Virt-manager"}},
-        properties = {tag = mytags[5], switch_to_tags = true}
-    },
-    {
-        rule_any = {class = {"discord"}},
-        properties = {tag = mytags[6], switch_to_tags = true}
-    },
-    {
-        rule_any = {class = {"vlc"}},
-        properties = {tag = mytags[7], switch_to_tags = true}
-    },
-    {
-        rule_any = {class = {"Gimp"}},
-        properties = {tag = mytags[8], switch_to_tags = true}
-    }
+    {rule_any = {class = {"Brave-browser"}},                properties = {tag = "WEB",  switch_to_tags = true}},
+    {rule_any = {class = {"code-oss"}},                     properties = {tag = "DEV",  switch_to_tags = true}},
+    {rule_any = {class = {"Steam", "Lutris", "Minecraft"}}, properties = {tag = "GAM",  switch_to_tags = true}},
+    {rule_any = {class = {"Virt-manager"}},                 properties = {tag = "VM",   switch_to_tags = true}},
+    {rule_any = {class = {"discord"}},                      properties = {tag = "CHAT", switch_to_tags = true}},
+    {rule_any = {class = {"vlc"}},                          properties = {tag = "MED",  switch_to_tags = true}},
+    {rule_any = {class = {"Gimp"}},                         properties = {tag = "GFX",  switch_to_tags = true}}
 }
 -- }}}
 
@@ -712,9 +705,7 @@ apps = {
     "numlockx",
     "picom",
     "redshift",
-    "pcloud",
     "flameshot",
-    "discord --start-minimized",
 }
 
 for _, app in ipairs(apps) do

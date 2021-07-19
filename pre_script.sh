@@ -1,8 +1,16 @@
 #!/bin/bash
 
-USER0="ange"
-MYHOSTNAME="${USER0^^}-DESKTOP"
-SYS_CONFIG_DIR="config/system"
+##### TODO #####
+# Cp ISO boot config
+# Refactor into function?
+
+USERNAME="ange"
+MYHOSTNAME="${USERNAME^^}-LAPTOP"
+TIMEZONE="Europe/Paris"
+CONFIG_DIR="config/"
+
+CP="cp -f"
+PACMAN="pacman --noconfirm --needed"
 
 PACKAGES=(
     alacritty
@@ -14,7 +22,6 @@ PACKAGES=(
     gparted ntfs-3g
     htop
     intel-ucode nvidia{,-settings}
-    kdenlive
     linux-headers
     lutris steam wine-{gecko,mono,staging} winetricks
     man-{db,pages} texinfo
@@ -32,17 +39,32 @@ PACKAGES=(
     zsh
 )
 
-cp -rf "$SYS_CONFIG_DIR"/etc /etc
-pacman -Syyu --noconfirm --needed "${PACKAGES[@]}"
+if [ ! -d /sys/firmware/efi/efivars ]; then
+    echo "ERROR: System must be UEFI"
+    exit 1
+fi
 
-ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+if [ ! "$(ping -c1 archlinux.org)" ]; then
+    echo 'ERROR; Check your internet connexion'
+    exit 1
+fi
+
+set -e
+
+"$CP" -r "$CONFIG_DIR"/etc /etc
+
+"$PACMAN" -Syyu reflector
+systemctl start reflector
+
+"$PACMAN" -S "${PACKAGES[@]}"
+
+ln -sf /usr/share/zoneinfo/"$TIMEZONE" /etc/localtime
 hwclock --systohc
 timedatectl set-ntp true
 
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g; s/#fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/g" /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
-echo "KEYMAP=fr-latin1" > /etc/vconsole.conf
 
 echo "$MYHOSTNAME" > /etc/hostname
 echo \
@@ -55,14 +77,14 @@ bootctl install
 echo -e "\nroot passwd"
 passwd
 
-useradd -m -G wheel $USER0
+useradd -m -G wheel $USERNAME
 
-echo "$USER0 passwd"
-passwd $USER0
+echo "$USERNAME passwd"
+passwd $USERNAME
 
 sed -i "s/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/" /etc/sudoers
 
-cp -rf "$SYS_CONFIG_DIR"/loader /boot/
+"$CP" -r "$CONFIG_DIR"/boot /boot/
 
 systemctl enable NetworkManager
 nvidia-xconfig

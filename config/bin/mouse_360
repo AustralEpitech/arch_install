@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# counts target = 8182 ~ 25cm
+
+sleep 3
+for i in {0..1023}; do
+    xdotool mousemove_relative 8 0 
+done

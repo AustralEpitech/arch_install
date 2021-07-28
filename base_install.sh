@@ -47,7 +47,8 @@ PACKAGES=(
 
 ask() {
     while true; do
-        read -rp "${BOLD}:: $1 [Y/n] ${NORMAL}" ANS
+        echo -en "${BOLD}:: $1 [Y/n] ${NORMAL}"
+        read -r ANS
         case "${ANS^^}" in
             '' | 'Y' | 'YES')
                 return 1

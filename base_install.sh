@@ -51,10 +51,10 @@ ask() {
         read -r ANS
         case "${ANS^^}" in
             '' | 'Y' | 'YES')
-                return 1
+                return 0
                 ;;
             'N' | 'NO')
-                return 0
+                return 1
                 ;;
         esac
     done
@@ -94,7 +94,7 @@ set_hostname() {
 }
 
 download_packages() {
-    pacman --noconfirm --needed -S ${PACKAGES[*]}
+    pacman --noconfirm --needed -Syyu "${PACKAGES[@]}"
 }
 
 create_user() {
@@ -132,11 +132,15 @@ configure_graphics() {
 }
 
 copy_dotfiles() {
+    set +e
+
+    ask 'Install OMZ?' && $SU 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+
     ask 'Copy dotfiles?' && $CP -r "$CONFIG_DIR"/.* /home/"$USERNAME"
 
-    ask 'Install OMZ?' && $SU "sh -c '$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
-
     ask 'Copy binaries?' && $CP "$CONFIG_DIR"/bin /home/"$USERNAME"
+
+    set -e
 }
 
 main() {

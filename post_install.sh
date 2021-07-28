@@ -22,5 +22,5 @@ git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin
 cd /tmp/paru-bin
 makepkg -si --noconfirm
 
-$PARU --noconfirm ${AUR_PACKAGES[*]}
-$PARU ${TECH_PACKAGES[*]}
+$PARU --noconfirm "${AUR_PACKAGES[@]}"
+$PARU "${TECH_PACKAGES[@]}"

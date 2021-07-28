@@ -110,7 +110,7 @@ set_hostname() {
 }
 
 download_packages() {
-    pacman $PAC_OPT "${PACKAGES[*]}"
+    pacman $PAC_OPT ${PACKAGES[*]}
 }
 
 create_user() {

@@ -36,6 +36,7 @@ PACKAGES=(
     noto-fonts{,-cjk,-emoji} ttf-dejavu
     openssh
     pipewire{,-alsa,-pulse}
+    reflector
     tree
     unrar
     vim
@@ -109,9 +110,7 @@ set_hostname() {
 }
 
 download_packages() {
-    pacman "$PAC_OPT"yyu reflector
-    systemctl start reflector
-    pacman "$PAC_OPT" "${PACKAGES[*]}"
+    pacman $PAC_OPT "${PACKAGES[*]}"
 }
 
 create_user() {

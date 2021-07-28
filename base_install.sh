@@ -46,22 +46,6 @@ PACKAGES=(
     zsh
 )
 
-AUR_PACKAGES=(
-    brave-bin
-    nerd-fonts-meslo
-    shellcheck-bin
-)
-
-TECH_PACKAGES=(
-    csfml
-    criterion
-    docker
-    emacs
-    gcovr
-    gdb
-    valgrind
-)
-
 ask() {
     while true; do
         read -rp "${BOLD}:: $1 [Y/n] ${NORMAL}" ANS
@@ -124,11 +108,6 @@ create_user() {
     $SED 's/^# %wheel ALL=(ALL) ALL$/%wheel ALL=(ALL) ALL/' /etc/sudoers
 }
 
-download_special_packages() {
-    $SU "$PWD/install_paru.sh && paru $PAC_OPT ${AUR_PACKAGES[*]}"
-    ask 'Do you want tech packages?' && $SU "paru $PAC_OPT ${TECH_PACKAGES[*]}"
-}
-
 set_bootloader() {
     bootctl install
     $CP /usr/share/systemd/bootctl/arch.conf "$ENTRIES"
@@ -161,6 +140,8 @@ copy_dotfiles() {
 }
 
 main() {
+    set -e
+
     check_system
     copy_system_config
     set_timezone
@@ -168,7 +149,6 @@ main() {
     set_hostname
     download_packages
     create_user
-    download_special_packages
     set_bootloader
     enable_network
     configure_graphics
@@ -176,5 +156,4 @@ main() {
     echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot to exit${NORMAL}"
 }
 
-set -e
 main

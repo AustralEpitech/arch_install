@@ -1,8 +1,9 @@
 {
+    "diffEditor.ignoreTrimWhitespace": false,
     "editor.detectIndentation": false,
     "editor.renderWhitespace": "boundary",
     "editor.wordWrap": "on",
-    "diffEditor.ignoreTrimWhitespace": false,
+    "security.workspace.trust.enabled": false,
     "C_Cpp.clang_format_fallbackStyle": "{ AllowShortCaseLabelsOnASingleLine: 'true', AllowShortFunctionsOnASingleLine: None, BreakBeforeBraces: Linux, IndentCaseLabels: 'true', IndentWidth: '4' }",
     "epitech-c-cpp-headers.headerType": "post2017",
     "epitech-c-cpp-headers.login": "",

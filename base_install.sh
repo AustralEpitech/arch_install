@@ -16,7 +16,6 @@ ROOT_DISK="$(lsblk -p --list | awk '$7 == "/" {print $1}')"
 CP='cp -f'
 SU="su $USERNAME -c"
 SED='sed -i'
-PAC_OPT='--noconfirm --needed -S'
 
 PACKAGES=(
     alacritty
@@ -73,7 +72,7 @@ check_system() {
 }
 
 copy_system_config() {
-    $CP -r "$CONFIG_DIR"/etc /etc
+    $CP -r "$CONFIG_DIR"/etc /
 }
 
 set_timezone() {
@@ -94,7 +93,7 @@ set_hostname() {
 }
 
 download_packages() {
-    pacman $PAC_OPT ${PACKAGES[*]}
+    pacman --noconfirm --needed -S ${PACKAGES[*]}
 }
 
 create_user() {
@@ -114,7 +113,7 @@ set_bootloader() {
     echo -e 'default arch.conf\ntimeout 3\neditor  no' > /boot/loader/loader.conf
 
     $SED '/^$/d; /^#/d;' "$ENTRIES"arch.conf
-    $SED "s/^options root=PARTUUID=XXXX rootfstype=XXXX add_efi_memmap$/options root=/dev/$ROOT_DISK/" "$ENTRIES"arch.conf
+    $SED "s+^options root=PARTUUID=XXXX rootfstype=XXXX add_efi_memmap\$+options root=/dev/$ROOT_DISK+" "$ENTRIES"arch.conf
 
     $CP "$ENTRIES"arch.conf "$ENTRIES"arch-fallback.conf
     $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$ENTRIES"arch-fallback.conf

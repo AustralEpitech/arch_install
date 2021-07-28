@@ -2,3 +2,4 @@
 
 sudo systemctl start docker
 sudo docker run -it --rm --name epitest -v $PWD:/tmp epitechcontent/epitest-docker:latest /bin/bash
+sudo systemctl stop docker

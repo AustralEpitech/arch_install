@@ -11,11 +11,12 @@ BOLD='\033[1m'
 GREEN='\033[32m'
 NORMAL='\033[0m'
 
-ENTRIES='/boot/loader/entries/'
+SYS_ENTRIES_DIR='/boot/loader/entries/'
 ROOT_DISK="$(lsblk -p --list | awk '$7 == "/" {print $1}')"
-CP='cp -f'
-SU="su $USERNAME -c"
+CP='cp -fv'
 SED='sed -i'
+SU="su $USERNAME -c"
+PAC_OPT='--needed -S'
 
 PACKAGES=(
     alacritty
@@ -43,6 +44,22 @@ PACKAGES=(
     xclip
     xorg{,-xinit}
     zsh
+)
+
+AUR_PACKAGES=(
+    brave-bin
+    nerd-fonts-meslo
+    shellcheck-bin
+)
+
+TECH_PACKAGES=(
+    csfml
+    criterion
+    docker
+    emacs
+    gcovr
+    gdb
+    valgrind
 )
 
 ask() {
@@ -73,10 +90,10 @@ check_system() {
 }
 
 copy_system_config() {
-    $CP -r "$CONFIG_DIR"/etc /
+    $CP -r "$CONFIG_DIR"etc /
 }
 
-set_timezone() {
+configure_clock() {
     ln -sf /usr/share/zoneinfo/"$TIMEZONE" /etc/localtime
     hwclock --systohc
     timedatectl set-ntp true
@@ -94,10 +111,10 @@ set_hostname() {
 }
 
 download_packages() {
-    pacman --noconfirm --needed -Syyu "${PACKAGES[@]}"
+    pacman --noconfirm ${PAC_OPT}yyu "${PACKAGES[@]}"
 }
 
-create_user() {
+manage_users() {
     echo -e "\n${BOLD}root passwd${NORMAL}"
     passwd
 
@@ -105,21 +122,39 @@ create_user() {
 
     echo -e "${BOLD}$USERNAME passwd${NORMAL}"
     passwd "$USERNAME"
+
     $SED 's/^# %wheel ALL=(ALL) ALL$/%wheel ALL=(ALL) ALL/' /etc/sudoers
+}
+
+download_special_packages() {
+    mv /etc/sudoers /etc/sudoers.bak
+    echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
+
+    ask 'Install OMZ?' && $SU 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+
+    $SU "git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm"
+
+    $SU "paru --noconfirm $PAC_OPT ${AUR_PACKAGES[@]}"
+
+    set +e
+    $SU "paru $PAC_OPT ${TECH_PACKAGES[@]}"
+    set -e
+
+    mv /etc/sudoers.bak /etc/sudoers
 }
 
 set_bootloader() {
     bootctl install
-    $CP /usr/share/systemd/bootctl/arch.conf "$ENTRIES"
+    $CP /usr/share/systemd/bootctl/arch.conf "$SYS_ENTRIES_DIR"
     echo -e 'default arch.conf\ntimeout 3\neditor  no' > /boot/loader/loader.conf
 
-    $SED '/^$/d; /^#/d;' "$ENTRIES"arch.conf
-    $SED "s+^options root=PARTUUID=XXXX rootfstype=XXXX add_efi_memmap\$+options root=/dev/$ROOT_DISK+" "$ENTRIES"arch.conf
+    $SED '/^$/d; /^#/d;' "$SYS_ENTRIES_DIR"arch.conf
+    $SED "s+^options root=PARTUUID=XXXX rootfstype=XXXX add_efi_memmap\$+options root=/dev/$ROOT_DISK+" "$SYS_ENTRIES_DIR"arch.conf
 
-    $CP "$ENTRIES"arch.conf "$ENTRIES"arch-fallback.conf
-    $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$ENTRIES"arch-fallback.conf
+    $CP "$SYS_ENTRIES_DIR"arch.conf "$SYS_ENTRIES_DIR"arch-fallback.conf
+    $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$SYS_ENTRIES_DIR"arch-fallback.conf
 
-    echo 'initrd  /intel-ucode.img' >> "$ENTRIES"arch.conf
+    echo 'initrd  /intel-ucode.img' >> "$SYS_ENTRIES_DIR"arch.conf
 }
 
 enable_network() {
@@ -134,13 +169,8 @@ configure_graphics() {
 copy_dotfiles() {
     set +e
 
-    ask 'Install OMZ?' && $SU 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
-
-    ask 'Copy dotfiles?' && $CP -r "$CONFIG_DIR"/.* /home/"$USERNAME"
-
-    ask 'Copy binaries?' && $CP "$CONFIG_DIR"/bin /home/"$USERNAME"
-
-    set -e
+    ask 'Copy dotfiles?' && $CP -r "$CONFIG_DIR".[^.]* /home/"$USERNAME"
+    ask 'Copy binaries?' && $CP -r "$CONFIG_DIR"bin /home/"$USERNAME"
 }
 
 main() {
@@ -148,16 +178,17 @@ main() {
 
     check_system
     copy_system_config
-    set_timezone
+    configure_clock
     set_locale
     set_hostname
     download_packages
-    create_user
+    manage_users
+    download_special_packages
     set_bootloader
     enable_network
     configure_graphics
     copy_dotfiles
-    echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot to exit${NORMAL}"
+    echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot${NORMAL}"
 }
 
 main

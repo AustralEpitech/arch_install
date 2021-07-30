@@ -100,14 +100,14 @@ configure_clock() {
 }
 
 set_locale() {
-    $SED 's/^#en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/; s/^#fr_FR.UTF-8 UTF-8$/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
+    $SED 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/; s/^#fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
     locale-gen
     echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 }
 
 set_hostname() {
     echo "$MYHOSTNAME" > /etc/hostname
-    echo -e "127.0.0.1  localhost\n::1         localhost\n127.0.1.1   $MYHOSTNAME.localdomain $MYHOSTNAME" >> /etc/hosts
+    echo -e "127.0.0.1   localhost\n::1         localhost\n127.0.1.1   $MYHOSTNAME.localdomain $MYHOSTNAME" >> /etc/hosts
 }
 
 download_packages() {
@@ -149,7 +149,7 @@ set_bootloader() {
     echo -e 'default arch.conf\ntimeout 3\neditor  no' > /boot/loader/loader.conf
 
     $SED '/^$/d; /^#/d;' "$SYS_ENTRIES_DIR"arch.conf
-    $SED "s+^options root=PARTUUID=XXXX rootfstype=XXXX add_efi_memmap\$+options root=/dev/$ROOT_DISK+" "$SYS_ENTRIES_DIR"arch.conf
+    $SED "s+^options root=PARTUUID=XXXX rootfstype=XXXX add_efi_memmap\$+options root=$ROOT_DISK+" "$SYS_ENTRIES_DIR"arch.conf
 
     $CP "$SYS_ENTRIES_DIR"arch.conf "$SYS_ENTRIES_DIR"arch-fallback.conf
     $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$SYS_ENTRIES_DIR"arch-fallback.conf

@@ -130,7 +130,8 @@ download_special_packages() {
     mv /etc/sudoers /etc/sudoers.bak
     echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
 
-    ask 'Install OMZ?' && $SU 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+    ask 'Install OMZ?' && $SU 'echo |sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && exit'
+    chsh -s "$(which zsh)" $USERNAME
 
     $SU "git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm"
 

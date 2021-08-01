@@ -12,7 +12,6 @@ GREEN='\033[32m'
 NORMAL='\033[0m'
 
 SYS_ENTRIES_DIR='/boot/loader/entries/'
-ROOT_DISK="$(lsblk -p --list | awk '$7 == "/" {print $1}')"
 CP='cp -fv'
 SED='sed -i'
 SU="su $USERNAME -c"
@@ -118,7 +117,7 @@ manage_users() {
     echo -e "\n${BOLD}root passwd${NORMAL}"
     passwd
 
-    useradd -mG wheel "$USERNAME"
+    useradd -mG wheel "$USERNAME" -s $(which zsh)
 
     echo -e "${BOLD}$USERNAME passwd${NORMAL}"
     passwd "$USERNAME"
@@ -131,7 +130,6 @@ download_special_packages() {
     echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
 
     ask 'Install OMZ?' && $SU 'echo |sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && exit'
-    chsh -s "$(which zsh)" $USERNAME
 
     $SU "git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm"
 
@@ -149,13 +147,14 @@ set_bootloader() {
     $CP /usr/share/systemd/bootctl/arch.conf "$SYS_ENTRIES_DIR"
     echo -e 'default arch.conf\ntimeout 3\neditor  no' > /boot/loader/loader.conf
 
-    $SED '/^$/d; /^#/d;' "$SYS_ENTRIES_DIR"arch.conf
-    $SED "s+^options root=PARTUUID=XXXX rootfstype=XXXX add_efi_memmap\$+options root=$ROOT_DISK+" "$SYS_ENTRIES_DIR"arch.conf
+    $SED '/^$/d; /^#/d; /^options/d' "$SYS_ENTRIES_DIR"arch.conf
+
+    echo 'initrd  /intel-ucode.img' >> "$SYS_ENTRIES_DIR"arch.conf
+    echo "options root=$ROOT_DISK=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$SYS_ENTRIES_DIR"arch.conf
 
     $CP "$SYS_ENTRIES_DIR"arch.conf "$SYS_ENTRIES_DIR"arch-fallback.conf
     $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$SYS_ENTRIES_DIR"arch-fallback.conf
 
-    echo 'initrd  /intel-ucode.img' >> "$SYS_ENTRIES_DIR"arch.conf
 }
 
 enable_network() {
@@ -164,7 +163,7 @@ enable_network() {
 
 configure_graphics() {
     nvidia-xconfig
-    $SED 's/^MODULES=()$/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+    $SED 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/' /etc/mkinitcpio.conf
 }
 
 copy_dotfiles() {

@@ -473,7 +473,7 @@ globalkeys = gears.table.join(
     awful.key(
         {"Control"}, "F6",
         function()
-            awful.spawn.with_shell("~/bin/toggle_touchpad.sh")
+            awful.spawn.with_shell("~/bin/toggle_touchpad")
         end,
         {description = "toggle touchpad", group = "hotkeys"}
     )

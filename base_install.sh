@@ -150,7 +150,7 @@ set_bootloader() {
     $SED '/^$/d; /^#/d; /^options/d' "$SYS_ENTRIES_DIR"arch.conf
 
     echo 'initrd  /intel-ucode.img' >> "$SYS_ENTRIES_DIR"arch.conf
-    echo "options root=$ROOT_DISK=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$SYS_ENTRIES_DIR"arch.conf
+    echo "options root=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$SYS_ENTRIES_DIR"arch.conf
 
     $CP "$SYS_ENTRIES_DIR"arch.conf "$SYS_ENTRIES_DIR"arch-fallback.conf
     $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$SYS_ENTRIES_DIR"arch-fallback.conf
@@ -173,6 +173,11 @@ copy_dotfiles() {
     ask 'Copy binaries?' && $CP -r "$CONFIG_DIR"bin /home/"$USERNAME"
 }
 
+self_destruction() {
+    ask 'Delete script folder?' && rm -rf $(pwd)
+    echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot${NORMAL}"
+}
+
 main() {
     set -e
 
@@ -188,7 +193,7 @@ main() {
     enable_network
     configure_graphics
     copy_dotfiles
-    echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot${NORMAL}"
+    self_destruction
 }
 
 main

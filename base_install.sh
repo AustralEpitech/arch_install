@@ -19,12 +19,10 @@ PAC_OPT='--needed -S'
 
 PACKAGES=(
     alacritty
-    base-devel clang cmake python{,-pip}
-    code
-    discord
+    base-devel cmake python{,-pip}
     gimp okular obs-studio
     git
-    gparted ntfs-3g
+    gparted
     htop
     intel-ucode nvidia{,-settings}
     linux-headers
@@ -37,7 +35,6 @@ PACKAGES=(
     pipewire{,-alsa,-pulse}
     reflector
     tree
-    unrar
     vim
     wget
     xclip

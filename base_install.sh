@@ -33,6 +33,7 @@ PACKAGES=(
     noto-fonts{,-cjk,-emoji} ttf-dejavu
     openssh
     pipewire{,-alsa,-pulse}
+    playerctl
     reflector
     tree
     vim

@@ -471,6 +471,34 @@ globalkeys = gears.table.join(
         {description = "toggle mic mute", group = "hotkeys"}
     ),
     awful.key(
+        {}, "XF86AudioPlay",
+        function()
+            awful.spawn("playerctl play-pause")
+        end,
+        {description = "play / pause media", group = "hotkeys"}
+    ),
+    awful.key(
+        {}, "XF86AudioStop",
+        function()
+            awful.spawn("playerctl stop")
+        end,
+        {description = "stop media", group = "hotkeys"}
+    ),
+    awful.key(
+        {}, "XF86AudioPrev",
+        function()
+            awful.spawn("playerctl previous")
+        end,
+        {description = "play previous media", group = "hotkeys"}
+    ),
+    awful.key(
+        {}, "XF86AudioNext",
+        function()
+            awful.spawn("playerctl next")
+        end,
+        {description = "play next media", group = "hotkeys"}
+    ),
+    awful.key(
         {"Control"}, "F6",
         function()
             awful.spawn.with_shell("~/bin/toggle_touchpad")

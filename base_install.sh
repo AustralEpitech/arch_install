@@ -20,20 +20,22 @@ PAC_OPT='--needed -S'
 PACKAGES=(
     alacritty
     base-devel cmake python{,-pip}
-    gimp okular obs-studio
+    code
+    discord_arch_electron
     git
     gparted
     htop
     intel-ucode nvidia{,-settings}
     linux-headers
     lutris steam wine-{gecko,mono,staging} winetricks
-    man-{db,pages} texinfo
+    man-{db,pages}
     neofetch
     networkmanager
     noto-fonts{,-cjk,-emoji} ttf-dejavu
+    okular
     openssh
-    pipewire{,-alsa,-pulse}
-    playerctl
+    p7zip
+    pipewire{,-alsa,-pulse} playerctl
     reflector
     tree
     vim
@@ -46,6 +48,7 @@ PACKAGES=(
 AUR_PACKAGES=(
     brave-bin
     nerd-fonts-meslo
+    noisetorch-bin
     shellcheck-bin
 )
 

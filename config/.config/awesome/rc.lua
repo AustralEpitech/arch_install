@@ -49,7 +49,7 @@ end
 config_dir = gears.filesystem.get_configuration_dir()
 wallpaper_dir = config_dir .. "wallpapers/"
 
-beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
+beautiful.init(config_dir .. "theme.lua")
 
 mytags = {"TTY", "WEB", "DEV", "CHAT", "VM", "GAM", "MED", "GFX", "ETC"}
 
@@ -445,14 +445,14 @@ globalkeys = gears.table.join(
     awful.key(
         {}, "XF86AudioRaiseVolume",
         function()
-            awful.spawn("pactl set-sink-volume 0 +5%")
+            awful.spawn.with_shell("pactl set-sink-mute 0 0 && pactl set-sink-volume 0 +5%")
         end,
         {description = "increase volume up by 5%", group = "hotkeys"}
     ),
     awful.key(
         {}, "XF86AudioLowerVolume",
         function()
-            awful.spawn("pactl set-sink-volume 0 -5%")
+            awful.spawn.with_shell("pactl set-sink-mute 0 0 && pactl set-sink-volume 0 -5%")
         end,
         {description = "decrease volume up by 5%", group = "hotkeys"}
     ),
@@ -476,13 +476,6 @@ globalkeys = gears.table.join(
             awful.spawn("playerctl play-pause")
         end,
         {description = "play / pause media", group = "hotkeys"}
-    ),
-    awful.key(
-        {}, "XF86AudioStop",
-        function()
-            awful.spawn("playerctl stop")
-        end,
-        {description = "stop media", group = "hotkeys"}
     ),
     awful.key(
         {}, "XF86AudioPrev",
@@ -730,6 +723,7 @@ apps = {
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
     "nm-applet",
     "xfce4-power-manager",
+    "/usr/lib/kdeconnectd",
     "numlockx",
     "picom",
     "redshift",

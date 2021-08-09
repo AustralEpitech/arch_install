@@ -169,8 +169,20 @@ local function set_wallpaper(s)
 end
 
 local function set_clock(s)
+    local dpi = require("beautiful.xresources").apply_dpi
+
     s.mytextclock = wibox.widget.textclock()
-    s.month_calendar = awful.widget.calendar_popup.month({screen = s})
+    s.month_calendar = awful.widget.calendar_popup.month({
+        screen = s,
+        style_year          = {border_width = dpi(1)},
+        style_month         = {border_width = dpi(1)},
+        style_yearheader    = {border_width = dpi(1)},
+        style_header        = {border_width = dpi(1)},
+        style_weekday       = {border_width = dpi(1)},
+        style_weeknumber    = {border_width = dpi(1)},
+        style_normal        = {border_width = dpi(1)},
+        style_focus         = {border_width = dpi(1)}
+    })
     s.month_calendar:attach(s.mytextclock)
 end
 

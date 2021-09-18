@@ -1,160 +1,91 @@
-#!/bin/bash
+#!/usr/bin/bash
 
-# User variables
-USERNAME='ange'
-MYHOSTNAME="${USERNAME^^}-LAPTOP"
-TIMEZONE='Europe/Paris'
-CONFIG_DIR='config/'
-
-# Colors
 BOLD='\033[1m'
 GREEN='\033[32m'
 NORMAL='\033[0m'
 
-SYS_ENTRIES_DIR='/boot/loader/entries/'
 CP='cp -fv'
 SED='sed -i'
-SU="su $USERNAME -c"
-PAC_OPT='--needed -S'
+SU="su $username -c"
+PAC_OPT='--noconfirm --needed -S'
 
-PACKAGES=(
-    alacritty
-    base-devel cmake python{,-pip}
-    code
-    discord_arch_electron
-    git
-    gparted
-    htop
-    intel-ucode nvidia{,-settings}
-    linux-headers
-    lutris steam wine-{gecko,mono,staging} winetricks
-    man-{db,pages}
-    neofetch
-    networkmanager
-    noto-fonts{,-cjk,-emoji} ttf-dejavu
-    okular
-    openssh
-    p7zip
-    pipewire{,-alsa,-pulse} playerctl
-    reflector
-    tree
-    vim
-    wget
-    xclip
-    xorg{,-xinit}
-    zsh
-)
+boot_entries='/boot/loader/entries'
 
-AUR_PACKAGES=(
-    brave-bin
-    nerd-fonts-meslo
-    noisetorch-bin
-    shellcheck-bin
-)
-
-TECH_PACKAGES=(
-    csfml
-    criterion
-    docker
-    emacs
-    gcovr
-    gdb
-    valgrind
-)
-
-ask() {
-    while true; do
-        echo -en "${BOLD}:: $1 [Y/n] ${NORMAL}"
-        read -r ANS
-        case "${ANS^^}" in
-            '' | 'Y' | 'YES')
-                return 0
-                ;;
-            'N' | 'NO')
-                return 1
-                ;;
-        esac
-    done
-}
-
-check_system() {
-    if [ ! -d '/sys/firmware/efi/efivars' ]; then
-        echo 'ERROR: System must be UEFI'
-        exit 1
-    fi
-
-    if [ ! "$(ping -c1 archlinux.org)" ]; then
-        echo 'ERROR: Check your internet connexion'
-        exit 1
-    fi
-}
-
-copy_system_config() {
-    $CP -r "$CONFIG_DIR"etc /
+get_config() {
+    source ./config
 }
 
 configure_clock() {
-    ln -sf /usr/share/zoneinfo/"$TIMEZONE" /etc/localtime
+    ln -sf /usr/share/zoneinfo/"$tz" /etc/localtime
     hwclock --systohc
     timedatectl set-ntp true
 }
 
 set_locale() {
-    $SED 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/; s/^#fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
+    for i in ${locales[*]}; do
+        $SED "s/^#$i/$i/" /etc/locale.gen
+    done
     locale-gen
-    echo 'LANG=en_US.UTF-8' > /etc/locale.conf
+    echo "LANG=$lang" > /etc/locale.conf
 }
 
 set_hostname() {
-    echo "$MYHOSTNAME" > /etc/hostname
-    echo -e "127.0.0.1   localhost\n::1         localhost\n127.0.1.1   $MYHOSTNAME.localdomain $MYHOSTNAME" >> /etc/hosts
+    echo "$hostname" > /etc/hostname
+    echo -e "127.0.0.1   localhost\n::1         localhost\n127.0.1.1   $hostname" >> /etc/hosts
 }
 
-download_packages() {
-    pacman --noconfirm ${PAC_OPT}yyu "${PACKAGES[@]}"
+download_pkg() {
+    $CP "etc/pacman.conf" /etc/
+    pacman "${PAC_OPT}yyu" "${pkg[*]}"
 }
 
 manage_users() {
-    echo -e "\n${BOLD}root passwd${NORMAL}"
-    passwd
+    zsh_path="$(which zsh)"
+    echo "root:$root_passwd" | chpasswd
 
-    useradd -mG wheel "$USERNAME" -s $(which zsh)
+    if [ -n "$zsh_path" ]; then
+        useradd -mG wheel "$username" -s "$zsh_path"
+    else
+        useradd -mG wheel "$username"
+    fi
 
-    echo -e "${BOLD}$USERNAME passwd${NORMAL}"
-    passwd "$USERNAME"
+    echo "$username:$user_passwd" | chpasswd
 
     $SED 's/^# %wheel ALL=(ALL) ALL$/%wheel ALL=(ALL) ALL/' /etc/sudoers
 }
 
-download_special_packages() {
+download_special_pkg() {
     mv /etc/sudoers /etc/sudoers.bak
     echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
 
-    ask 'Install OMZ?' && $SU 'echo |sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && exit'
+    [ "$omz" ] && $SU 'yes yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
 
     $SU "git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm"
 
-    $SU "paru --noconfirm $PAC_OPT ${AUR_PACKAGES[@]}"
+    [ "$aur_install" ] && $SU "paru $PAC_OPT ${aur_pkg[*]}"
 
-    set +e
-    $SU "paru $PAC_OPT ${TECH_PACKAGES[@]}"
-    set -e
+    [ "$tech_install" ] && $SU "paru $PAC_OPT ${tech_pkg[*]}"
 
     mv /etc/sudoers.bak /etc/sudoers
 }
 
 set_bootloader() {
     bootctl install
-    $CP /usr/share/systemd/bootctl/arch.conf "$SYS_ENTRIES_DIR"
-    echo -e 'default arch.conf\ntimeout 3\neditor  no' > /boot/loader/loader.conf
+    mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/100-systemd-boot.hook
+    $CP /usr/share/systemd/bootctl/arch.conf "$boot_entries"
+    echo -e "$btl_opt" > /boot/loader/loader.conf
 
-    $SED '/^$/d; /^#/d; /^options/d' "$SYS_ENTRIES_DIR"arch.conf
+    $SED '/^$/d; /^#/d; /^options/d' "$boot_entries"/arch.conf
 
-    echo 'initrd  /intel-ucode.img' >> "$SYS_ENTRIES_DIR"arch.conf
-    echo "options root=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$SYS_ENTRIES_DIR"arch.conf
+    if [ -n "$cpu" ]; then
+        pacman "$PAC_OPT" "$cpu"-ucode
+        echo "initrd  /$cpu-ucode.img" >> "$boot_entries"/arch.conf
+    fi
 
-    $CP "$SYS_ENTRIES_DIR"arch.conf "$SYS_ENTRIES_DIR"arch-fallback.conf
-    $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$SYS_ENTRIES_DIR"arch-fallback.conf
+    echo "options root=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$boot_entries"/arch.conf
+
+    $CP "$boot_entries"/arch.conf "$boot_entries"/arch-fallback.conf
+    $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$boot_entries"/arch-fallback.conf
 
 }
 
@@ -163,37 +94,39 @@ enable_network() {
 }
 
 configure_graphics() {
-    nvidia-xconfig
-    $SED 's/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/' /etc/mkinitcpio.conf
-}
-
-copy_dotfiles() {
-    set +e
-
-    ask 'Copy dotfiles?' && $CP -r "$CONFIG_DIR".[^.]* /home/"$USERNAME"
-    ask 'Copy binaries?' && $CP -r "$CONFIG_DIR"bin /home/"$USERNAME"
+    case "$gpu" in
+        'nvidia')
+            pacman "$PAC_OPT" nvidia{,-settings}
+            mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook
+            $SED "s/^modules=(/modules=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
+            nvidia-xconfig
+            ;;
+        'amd')
+            pacman "$PAC_OPT" xf86-video-amdgpu
+            $SED "s/^modules=(/modules=(amdgpu/" /etc/mkinitcpio.conf
+            ;;
+    esac
 }
 
 self_destruction() {
-    ask 'Delete script folder?' && rm -rf $(pwd)
+    [ "$rm_script" ] && rm -rfv "$(pwd)"
+
     echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot${NORMAL}"
 }
 
 main() {
     set -e
 
-    check_system
-    copy_system_config
+    get_config
     configure_clock
     set_locale
     set_hostname
-    download_packages
+    download_pkg
     manage_users
-    download_special_packages
+    download_special_pkg
     set_bootloader
     enable_network
     configure_graphics
-    copy_dotfiles
     self_destruction
 }
 

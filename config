@@ -1,0 +1,63 @@
+######################
+### User Variables ###
+######################
+# Comment to disable
+
+username='ange'
+user_passwd='sdfg'
+root_passwd="$user_passwd"
+
+hostname="${username^^}-LAPTOP"
+
+tz='Europe/Paris'
+locales=(
+    'en_US.UTF-8 UTF-8'
+    'fr_FR.UTF-8 UTF-8'
+)
+lang="${locales[0]% *}" # first locale
+
+omz='1'
+#aur_install='1'
+#tech_install='1'
+
+cpu='intel'
+#cpu_pkg='amd'
+
+gpu='nvidia'
+#gpu='amd'
+
+btl_opt='default arch\ntimeout 3\neditor  no'
+
+#rm_script='1'
+
+pkg=(
+    base-devel linux-headers
+    git
+    htop
+    man-{db,pages}
+    neofetch
+    networkmanager
+    noto-fonts{,-cjk,-emoji} ttf-dejavu terminus-font
+    openssh
+    qutebrowser python-adblock
+    reflector
+    tree
+    vim
+    wget
+    zsh
+)
+
+aur_pkg=(
+    noisetorch-bin
+    shellcheck-bin
+)
+
+tech_pkg=(
+    csfml
+    criterion
+    docker
+    emacs
+    gcovr
+    gdb
+    valgrind
+)

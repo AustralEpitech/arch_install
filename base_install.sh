@@ -12,10 +12,9 @@ PAC_OPT='--noconfirm --needed -S'
 boot_entries='/boot/loader/entries'
 
 get_config() {
-    local ANS
-
     less ./config
-    read -rp ':: Press enter to start'
+    echo -en "$BOLD:: Press enter to start$NORMAL"
+    read -r
     source ./config
 }
 
@@ -40,7 +39,7 @@ set_hostname() {
 
 download_pkg() {
     $CP "etc/pacman.conf" /etc/
-    pacman "${PAC_OPT}yyu" "${pkg[*]}"
+    pacman ${PAC_OPT}yyu "${pkg[@]}"
 }
 
 manage_users() {
@@ -64,7 +63,7 @@ download_special_pkg() {
 
     [ "$omz" ] && $SU 'yes yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
 
-    $SU "git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm"
+    $SU 'git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm'
 
     [ "$aur_install" ] && $SU "paru $PAC_OPT ${aur_pkg[*]}"
 

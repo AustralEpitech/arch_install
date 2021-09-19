@@ -39,7 +39,6 @@ pkg=(
     networkmanager
     noto-fonts{,-cjk,-emoji} ttf-dejavu terminus-font
     openssh
-    qutebrowser python-adblock
     reflector
     tree
     vim

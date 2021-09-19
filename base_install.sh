@@ -12,6 +12,10 @@ PAC_OPT='--noconfirm --needed -S'
 boot_entries='/boot/loader/entries'
 
 get_config() {
+    local ANS
+
+    less ./config
+    read -rp ':: Press enter to start'
     source ./config
 }
 

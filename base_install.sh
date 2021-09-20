@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+source ./config
+
 BOLD='\033[1m'
 GREEN='\033[32m'
 NORMAL='\033[0m'
@@ -15,7 +17,6 @@ get_config() {
     less ./config
     echo -en "$BOLD:: Press enter to start$NORMAL"
     read -r
-    source ./config
 }
 
 configure_clock() {

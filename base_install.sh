@@ -75,7 +75,7 @@ download_special_pkg() {
 
 set_bootloader() {
     bootctl install
-    mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/100-systemd-boot.hook
+    mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/100-systemd-boot.hook /etc/pacman.d/hooks/
     $CP /usr/share/systemd/bootctl/arch.conf "$boot_entries"
     echo -e "$btl_opt" > /boot/loader/loader.conf
 

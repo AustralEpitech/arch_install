@@ -17,7 +17,7 @@ To install the base system, run:
 ./base_install.sh
 ```
 
-If you want to install awesomeWM, reboot, login as a normal user and run as sudo:
+If you want to install awesomeWM, reboot, login as a normal user and run:
 ```
 awesomewm/awesome.sh
 ```

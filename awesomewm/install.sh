@@ -21,6 +21,11 @@ clone_config() {
 }
 
 main() {
+    if [ "$EUID" = 0 ]; then
+        echo 'This script cannot be run as root'
+        exit 1
+    fi
+
     set -e
     review_config
     install_packages

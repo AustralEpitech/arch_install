@@ -13,7 +13,7 @@ PAC_OPT='--noconfirm --needed -S'
 
 boot_entries='/boot/loader/entries'
 
-get_config() {
+review_config() {
     less ./config
     echo -en "$BOLD:: Press enter to start$NORMAL"
     read -r
@@ -119,7 +119,7 @@ self_destruction() {
 main() {
     set -e
 
-    get_config
+    review_config
     configure_clock
     set_locale
     set_hostname

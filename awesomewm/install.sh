@@ -2,6 +2,12 @@
 
 source ./config
 
+review_config() {
+    less ./config
+    echo -en "$BOLD:: Press enter to start$NORMAL"
+    read -r
+}
+
 install_packages() {
     paru -Syu "$packages[*]"
 }
@@ -16,6 +22,7 @@ clone_config() {
 
 main() {
     set -e
+    review_config
     install_packages
     set_xinit
     clone_config

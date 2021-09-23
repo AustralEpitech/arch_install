@@ -2,6 +2,9 @@
 
 source ./config
 
+BOLD='\033[1m'
+NORMAL='\033[0m'
+
 review_config() {
     less ./config
     echo -en "$BOLD:: Press enter to start$NORMAL"
@@ -17,7 +20,7 @@ set_xinit() {
 }
 
 clone_config() {
-   git clone --bare --recurse-submodules git@github.com:AustralEpitech/dotfiles.git $HOME/.dotfiles 
+    echo '${BOLD}TODO: add github GPG key and clone dotfiles: git clone --bare --recurse-submodules git@github.com:AustralEpitech/dotfiles.git $HOME/.dotfiles${NORMAL}'
 }
 
 main() {

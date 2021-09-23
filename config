@@ -17,7 +17,6 @@ locales=(
 lang="${locales[0]% *}" # first locale
 
 omz='1'
-#aur_install='1'
 #tech_install='1'
 
 cpu='intel'
@@ -39,16 +38,12 @@ pkg=(
     networkmanager
     noto-fonts{,-cjk,-emoji} ttf-dejavu terminus-font
     openssh
+    ranger
     reflector
     tree
     vim
     wget
     zsh
-)
-
-aur_pkg=(
-    noisetorch-bin
-    shellcheck-bin
 )
 
 tech_pkg=(

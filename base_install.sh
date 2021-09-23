@@ -66,8 +66,6 @@ download_special_pkg() {
 
     $SU 'git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm'
 
-    [ "$aur_install" ] && $SU "paru $PAC_OPT ${aur_pkg[*]}"
-
     [ "$tech_install" ] && $SU "paru $PAC_OPT ${tech_pkg[*]}"
 
     mv /etc/sudoers.bak /etc/sudoers
@@ -101,7 +99,7 @@ configure_graphics() {
     case "$gpu" in
         'nvidia')
             pacman "$PAC_OPT" nvidia{,-settings}
-            mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook
+            mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook etc/pacman.d/hooks
             $SED "s/^modules=(/modules=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
             nvidia-xconfig
             ;;

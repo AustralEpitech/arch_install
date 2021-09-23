@@ -1,26 +1,22 @@
 #!/usr/bin/bash
 
-PACKAGES=(
-    alacritty
-    awesome
-    flameshot
-    gnome-themes-extra
-    i3lock
-    libreoffice-fresh
-    lutris steam wine-{gecko,mono,staging} winetricks
-    lxappearance
-    network-manager-applet
-    picom
-    pipewire{,-alsa,-pulse} playerctl
-    polkit-gnome
-    redshift
-    thunar
-    xfce4-power-manager
-    xorg-{server,setxkbmap,xbacklight,xev,xinit,xinput,xkill,xprop,xrandr,xrdb,xset} xclip
-)
+source ./config
 
-set -e
+install_packages() {
+    paru -Syu "$packages[*]"
+}
 
-sudo pacman -S "$PACKAGES[@]"
+set_xinit() {
+    echo -e '#!/bin/sh\n\nexec awesome' > "$HOME"/.xinitrc
+}
 
-echo -e '#!/bin/sh\n\nexec awesome' > "$HOME"/.xinitrc
+clone_config() {
+   git clone --bare --recurse-submodules git@github.com:AustralEpitech/dotfiles.git $HOME/.dotfiles 
+}
+
+main() {
+    set -e
+    install_packages
+    set_xinit
+    clone_config
+}

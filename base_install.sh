@@ -9,7 +9,7 @@ NORMAL='\033[0m'
 CP='cp -fv'
 SED='sed -i'
 SU="su $username -c"
-PAC_OPT='--noconfirm --needed -S'
+PACMAN='pacman --noconfirm --needed -S'
 
 boot_entries='/boot/loader/entries'
 
@@ -40,7 +40,7 @@ set_hostname() {
 
 download_pkg() {
     $CP "etc/pacman.conf" /etc/
-    pacman ${PAC_OPT}yyu "${pkg[@]}"
+    ${PACMAN}yyu "${pkg[@]}"
 }
 
 manage_users() {
@@ -66,7 +66,7 @@ download_special_pkg() {
 
     $SU 'git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm'
 
-    [ "$tech_install" ] && $SU "paru $PAC_OPT ${tech_pkg[*]}"
+    [ "$tech_install" ] && $SU "paru --no-confirm --needed -S ${tech_pkg[*]}"
 
     mv /etc/sudoers.bak /etc/sudoers
 }
@@ -80,7 +80,7 @@ set_bootloader() {
     $SED '/^$/d; /^#/d; /^options/d' "$boot_entries"/arch.conf
 
     if [ -n "$cpu" ]; then
-        pacman "$PAC_OPT" "$cpu"-ucode
+        $PACMAN "$cpu"-ucode
         echo "initrd  /$cpu-ucode.img" >> "$boot_entries"/arch.conf
     fi
 
@@ -98,13 +98,13 @@ enable_network() {
 configure_graphics() {
     case "$gpu" in
         'nvidia')
-            pacman "$PAC_OPT" nvidia{,-settings}
-            mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook etc/pacman.d/hooks
+            $PACMAN nvidia{,-settings}
+            mkdir /etc/pacman.d/hooks -p && $CP /etc/pacman.d/hooks/nvidia.hook etc/pacman.d/hooks
             $SED "s/^modules=(/modules=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
             nvidia-xconfig
             ;;
         'amd')
-            pacman "$PAC_OPT" xf86-video-amdgpu
+            $PACMAN xf86-video-amdgpu
             $SED "s/^modules=(/modules=(amdgpu/" /etc/mkinitcpio.conf
             ;;
     esac

@@ -9,7 +9,7 @@ review_config() {
 }
 
 install_packages() {
-    paru -Syu "$packages[*]"
+    paru --noconfirm --needed -Syu "${packages[@]}"
 }
 
 set_xinit() {

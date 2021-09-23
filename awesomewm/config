@@ -18,7 +18,7 @@ packages=(
     network-manager-applet
     noisetorch-bin
     obs-studio
-    okular
+    okular phonon-qt5-vlc
     pasystray
     pavucontrol
     picom-git

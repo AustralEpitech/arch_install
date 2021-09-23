@@ -100,12 +100,12 @@ configure_graphics() {
         'nvidia')
             $PACMAN nvidia{,-settings}
             mkdir /etc/pacman.d/hooks -p && $CP /etc/pacman.d/hooks/nvidia.hook etc/pacman.d/hooks
-            $SED "s/^modules=(/modules=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
+            $SED "s/^MODULES=(/modules=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
             nvidia-xconfig
             ;;
         'amd')
             $PACMAN xf86-video-amdgpu
-            $SED "s/^modules=(/modules=(amdgpu/" /etc/mkinitcpio.conf
+            $SED "s/^MODULES=(/modules=(amdgpu/" /etc/mkinitcpio.conf
             ;;
     esac
 }

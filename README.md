@@ -1,5 +1,5 @@
 # Arch Installer
- 
+
 My personal Arch install script. It automates the step 2 of ArchWiki's [Installation guide](https://wiki.archlinux.org/title/Installation_guide)
 
  ## How to

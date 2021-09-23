@@ -20,19 +20,22 @@ set_xinit() {
 }
 
 clone_config() {
-    config=git --git-dir "$HOME"/.dotfiles --work-tree "$HOME"
+    config="git --git-dir $HOME/.dotfiles --work-tree $HOME"
+
     echo -e "${BOLD}TODO: add github GPG key and clone dotfiles: git clone --bare git@github.com:AustralEpitech/dotfiles.git $HOME/.dotfiles"
     echo -en ":: Do you want to clone public repo? [Y/n] $NORMAL"
     read -r ans
     case "${ans,,}" in
         '' | 'y' | 'yes')
             git clone --bare https://github.com/AustralEpitech/dotfiles.git "$HOME"/.dotfiles
-            config checkout main . 
-            config submodule init
-            config submodule update
+            $config checkout main "$HOME"
+            $config submodule init
+            $config submodule update
             ;;
     esac
 }
+
+# TODO : ssh config, xorg cp
 
 main() {
     if [ "$EUID" = 0 ]; then

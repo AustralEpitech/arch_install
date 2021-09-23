@@ -20,12 +20,16 @@ set_xinit() {
 }
 
 clone_config() {
-    echo -e "${BOLD}TODO: add github GPG key and clone dotfiles: git clone --bare --recurse-submodules git@github.com:AustralEpitech/dotfiles.git $HOME/.dotfiles"
+    config=git --git-dir "$HOME"/.dotfiles --work-tree "$HOME"
+    echo -e "${BOLD}TODO: add github GPG key and clone dotfiles: git clone --bare git@github.com:AustralEpitech/dotfiles.git $HOME/.dotfiles"
     echo -en ":: Do you want to clone public repo? [Y/n] $NORMAL"
     read -r ans
     case "${ans,,}" in
         '' | 'y' | 'yes')
-            git clone --bare --recurse-submodules https://github.com/AustralEpitech/dotfiles.git "$HOME"/.dotfiles
+            git clone --bare https://github.com/AustralEpitech/dotfiles.git "$HOME"/.dotfiles
+            config checkout main . 
+            config submodule init
+            config submodule update
             ;;
     esac
 }

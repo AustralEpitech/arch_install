@@ -29,7 +29,6 @@ packages=(
     qemu dnsmasq edk2-ovmf iptables-nft virt-manager
     qt5-styleplugins
     shellcheck-bin
-    torbrowser-launcher
     virt-manager
     xorg-{server,xinit} xclip xdotool
 )

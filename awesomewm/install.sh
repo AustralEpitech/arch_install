@@ -12,7 +12,7 @@ review_config() {
 }
 
 install_packages() {
-    paru --noconfirm --needed -Syu "${packages[@]}"
+    paru --noconfirm --needed -Syu "${packages[*]}"
 }
 
 set_xinit() {
@@ -31,6 +31,7 @@ clone_config() {
             $config checkout main "$HOME"
             $config submodule init
             $config submodule update
+            $config config status.showUntrackedFiles no
             ;;
     esac
 }

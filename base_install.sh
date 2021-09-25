@@ -99,7 +99,7 @@ configure_graphics() {
     case "$gpu" in
         'nvidia')
             $PACMAN nvidia{,-settings}
-            mkdir /etc/pacman.d/hooks -p && $CP /etc/pacman.d/hooks/nvidia.hook etc/pacman.d/hooks
+            mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook /etc/pacman.d/hooks
             $SED "s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
             nvidia-xconfig
             ;;

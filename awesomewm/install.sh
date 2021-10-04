@@ -2,6 +2,8 @@
 
 source ./config
 
+CP='sudo cp -rfv'
+
 BOLD='\033[1m'
 NORMAL='\033[0m'
 
@@ -15,19 +17,22 @@ install_packages() {
     paru --noconfirm --needed -Syu "${packages[*]}"
 }
 
-set_xinit() {
+configure_xorg() {
     echo -e '#!/bin/sh\n\nexec awesome' > "$HOME"/.xinitrc
+
+    echo 'enter sudo passwd to copy xorg config'
+    $CP ../etc/X11 /etc
 }
 
 clone_config() {
     config="git --git-dir $HOME/.dotfiles --work-tree $HOME"
 
-    echo -e "${BOLD}TODO: add github GPG key and clone dotfiles: git clone --bare git@github.com:AustralEpitech/dotfiles.git $HOME/.dotfiles"
     echo -en ":: Do you want to clone public repo? [Y/n] $NORMAL"
     read -r ans
     case "${ans,,}" in
         '' | 'y' | 'yes')
             git clone --bare https://github.com/AustralEpitech/dotfiles.git "$HOME"/.dotfiles
+            #git clone --bare git@github.com:AustralEpitech/dotfiles.git $HOME/.dotfiles
             $config checkout main "$HOME"
             $config submodule init
             $config submodule update
@@ -36,7 +41,7 @@ clone_config() {
     esac
 }
 
-# TODO : ssh config, xorg cp
+# TODO : ssh config
 
 main() {
     if [ "$EUID" = 0 ]; then
@@ -47,7 +52,7 @@ main() {
     set -e
     review_config
     install_packages
-    set_xinit
+    configure_xorg
     clone_config
 }
 

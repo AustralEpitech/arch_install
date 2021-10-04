@@ -74,14 +74,15 @@ download_special_pkg() {
 set_bootloader() {
     bootctl install
     mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/100-systemd-boot.hook /etc/pacman.d/hooks/
-    $CP /usr/share/systemd/bootctl/arch.conf "$boot_entries"
     echo -e "$btl_opt" > /boot/loader/loader.conf
+    echo -e 'title   Arch Linux\nlinux   /vmlinuz-linux\ninitrd  /initramfs-linux.img' > "$boot_entries"/arch.conf
 
-    $SED '/^$/d; /^#/d; /^options/d' "$boot_entries"/arch.conf
-
-    if [ -n "$cpu" ]; then
-        $PACMAN "$cpu"-ucode
-        echo "initrd  /$cpu-ucode.img" >> "$boot_entries"/arch.conf
+    if [ -n "$(lscpu | grep GenuineIntel)" ]; then
+        $PACMAN intel-ucode
+        echo "initrd  /$intel-ucode.img" >> "$boot_entries"/arch.conf
+    elif [ -n "$(lscpu | grep AuthenticAMD)" ]; then
+        $PACMAN amd-ucode
+        echo "initrd  /$amd-ucode.img" >> "$boot_entries"/arch.conf
     fi
 
     echo "options root=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$boot_entries"/arch.conf

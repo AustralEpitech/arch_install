@@ -19,9 +19,6 @@ lang="${locales[0]% *}" # first locale
 omz='1'
 #tech_install='1'
 
-cpu='intel'
-#cpu_pkg='amd'
-
 gpu='nvidia'
 #gpu='amd'
 
@@ -36,7 +33,7 @@ pkg=(
     man-{db,pages}
     neofetch
     networkmanager
-    noto-fonts{,-cjk,-emoji} ttf-dejavu terminus-font
+    noto-fonts{,-cjk,-emoji} ttf-{dejavu,liberation} terminus-font
     openssh
     ranger
     reflector

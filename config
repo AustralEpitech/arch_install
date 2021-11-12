@@ -19,9 +19,6 @@ lang="${locales[0]% *}" # first locale
 omz='1'
 #tech_install='1'
 
-gpu='nvidia'
-#gpu='amd'
-
 btl_opt='default arch\ntimeout 3\neditor  no'
 
 #rm_script='1'
@@ -32,7 +29,6 @@ pkg=(
     htop
     man-{db,pages}
     neofetch
-    networkmanager
     noto-fonts{,-cjk,-emoji} ttf-{dejavu,liberation} terminus-font
     openssh
     ranger

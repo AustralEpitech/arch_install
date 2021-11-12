@@ -9,128 +9,109 @@ NORMAL='\033[0m'
 CP='cp -fv'
 SED='sed -i'
 SU="su $username -c"
-PACMAN='pacman --noconfirm --needed -S'
+PACMAN='pacman --noconfirm --needed -Syu'
 
 boot_entries='/boot/loader/entries'
 
-review_config() {
-    less ./config
-    echo -en "$BOLD:: Press enter to start$NORMAL"
-    read -r
-}
+#############
+### Clock ###
+#############
+ln -sf /usr/share/zoneinfo/"$tz" /etc/localtime
+hwclock --systohc
+timedatectl set-ntp true
 
-configure_clock() {
-    ln -sf /usr/share/zoneinfo/"$tz" /etc/localtime
-    hwclock --systohc
-    timedatectl set-ntp true
-}
+##############
+### Locale ###
+##############
+for i in ${locales[*]}; do
+    $SED "s/^#$i/$i/" /etc/locale.gen
+done
+locale-gen
+echo "LANG=$lang" > /etc/locale.conf
 
-set_locale() {
-    for i in ${locales[*]}; do
-        $SED "s/^#$i/$i/" /etc/locale.gen
-    done
-    locale-gen
-    echo "LANG=$lang" > /etc/locale.conf
-}
+################
+### Hostname ###
+################
+echo "$hostname" > /etc/hostname
 
-set_hostname() {
-    echo "$hostname" > /etc/hostname
-    echo -e "127.0.0.1   localhost\n::1         localhost\n127.0.1.1   $hostname" >> /etc/hosts
-}
+################
+### Packages ###
+################
+$CP "etc/pacman.conf" /etc/
+${PACMAN} "${pkg[@]}"
 
-download_pkg() {
-    $CP "etc/pacman.conf" /etc/
-    ${PACMAN}yyu "${pkg[@]}"
-}
+#############
+### Users ###
+#############
+zsh_path="$(which zsh)"
+echo "root:$root_passwd" | chpasswd
 
-manage_users() {
-    zsh_path="$(which zsh)"
-    echo "root:$root_passwd" | chpasswd
+if [ -n "$zsh_path" ]; then
+    useradd -mG wheel "$username" -s "$zsh_path"
+    $SU 'yes yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+else
+    useradd -mG wheel "$username"
+fi
 
-    if [ -n "$zsh_path" ]; then
-        useradd -mG wheel "$username" -s "$zsh_path"
-    else
-        useradd -mG wheel "$username"
-    fi
+echo "$username:$user_passwd" | chpasswd
 
-    echo "$username:$user_passwd" | chpasswd
+$SED 's/^# %wheel ALL=(ALL) ALL$/%wheel ALL=(ALL) ALL/' /etc/sudoers
 
-    $SED 's/^# %wheel ALL=(ALL) ALL$/%wheel ALL=(ALL) ALL/' /etc/sudoers
-}
+###########
+### AUR ###
+###########
+mv /etc/sudoers /etc/sudoers.bak
+echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
 
-download_special_pkg() {
-    mv /etc/sudoers /etc/sudoers.bak
-    echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
+$SU 'git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm'
 
-    [ "$omz" ] && $SU 'yes yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+[ "$tech_install" ] && $SU "paru --no-confirm --needed -S ${tech_pkg[*]}"
 
-    $SU 'git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm'
+mv /etc/sudoers.bak /etc/sudoers
 
-    [ "$tech_install" ] && $SU "paru --no-confirm --needed -S ${tech_pkg[*]}"
+##################
+### Bootloader ###
+##################
+bootctl install
+mkdir -p /etc/pacman.d/hooks && $CP etc/pacman.d/hooks/100-systemd-boot.hook /etc/pacman.d/hooks/
+echo -e "$btl_opt" > /boot/loader/loader.conf
+echo -e 'title   Arch Linux\nlinux   /vmlinuz-linux\ninitrd  /initramfs-linux.img' > "$boot_entries"/arch.conf
 
-    mv /etc/sudoers.bak /etc/sudoers
-}
+if lscpu | grep -q GenuineIntel; then
+    $PACMAN intel-ucode
+    echo "initrd  /intel-ucode.img" >> "$boot_entries"/arch.conf
+elif lscpu | grep -q AuthenticAMD; then
+    $PACMAN amd-ucode
+    echo "initrd  /amd-ucode.img" >> "$boot_entries"/arch.conf
+fi
 
-set_bootloader() {
-    bootctl install
-    mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/100-systemd-boot.hook /etc/pacman.d/hooks/
-    echo -e "$btl_opt" > /boot/loader/loader.conf
-    echo -e 'title   Arch Linux\nlinux   /vmlinuz-linux\ninitrd  /initramfs-linux.img' > "$boot_entries"/arch.conf
+echo "options root=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$boot_entries"/arch.conf
 
-    if [ -n "$(lscpu | grep GenuineIntel)" ]; then
-        $PACMAN intel-ucode
-        echo "initrd  /$intel-ucode.img" >> "$boot_entries"/arch.conf
-    elif [ -n "$(lscpu | grep AuthenticAMD)" ]; then
-        $PACMAN amd-ucode
-        echo "initrd  /$amd-ucode.img" >> "$boot_entries"/arch.conf
-    fi
+$CP "$boot_entries"/arch.conf "$boot_entries"/arch-fallback.conf
+$SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$boot_entries"/arch-fallback.conf
 
-    echo "options root=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$boot_entries"/arch.conf
+###############
+### Network ###
+###############
+$PACMAN networkmanager
+systemctl enable NetworkManager
 
-    $CP "$boot_entries"/arch.conf "$boot_entries"/arch-fallback.conf
-    $SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$boot_entries"/arch-fallback.conf
+###########
+### GPU ###
+###########
+if lspci | grep "NVIDIA"; then
+    $PACMAN nvidia{,-settings}
+    mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook /etc/pacman.d/hooks
+    $SED "s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
+    nvidia-xconfig
+elif lspci | grep "Radeon"; then
+    $PACMAN xf86-video-amdgpu
+    $SED "s/^MODULES=(/MODULES=(amdgpu/" /etc/mkinitcpio.conf
+fi
 
-}
+###########
+### END ###
+###########
+[ "$rm_script" ] && rm -rfv "$(pwd)"
 
-enable_network() {
-    systemctl enable NetworkManager
-}
-
-configure_graphics() {
-    case "$gpu" in
-        'nvidia')
-            $PACMAN nvidia{,-settings}
-            mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook /etc/pacman.d/hooks
-            $SED "s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
-            nvidia-xconfig
-            ;;
-        'amd')
-            $PACMAN xf86-video-amdgpu
-            $SED "s/^MODULES=(/MODULES=(amdgpu/" /etc/mkinitcpio.conf
-            ;;
-    esac
-}
-
-self_destruction() {
-    [ "$rm_script" ] && rm -rfv "$(pwd)"
-
-    echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot${NORMAL}"
-}
-
-main() {
-    set -e
-
-    review_config
-    configure_clock
-    set_locale
-    set_hostname
-    download_pkg
-    manage_users
-    download_special_pkg
-    set_bootloader
-    enable_network
-    configure_graphics
-    self_destruction
-}
-
-main
+echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot${NORMAL}"

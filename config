@@ -7,14 +7,13 @@ username='ange'
 user_passwd='sdfg'
 root_passwd="$user_passwd"
 
-hostname="${username^^}-LAPTOP"
+hostname="${username^^}-PC"
 
 tz='Europe/Paris'
 locales=(
     'en_US.UTF-8 UTF-8'
-    'fr_FR.UTF-8 UTF-8'
 )
-lang="${locales[0]% *}" # first locale
+lang="en_US.UTF-8"
 
 omz='1'
 #tech_install='1'
@@ -29,11 +28,12 @@ pkg=(
     htop
     man-{db,pages}
     neofetch
-    noto-fonts{,-cjk,-emoji} ttf-{dejavu,liberation} terminus-font
+    terminus-font
     openssh
     ranger
     reflector
     tree
+    unrar unzip zip
     vim
     wget
     zsh
@@ -43,7 +43,6 @@ tech_pkg=(
     csfml
     criterion
     docker
-    emacs
     gcovr
     gdb
     valgrind

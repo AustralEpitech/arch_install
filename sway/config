@@ -1,0 +1,24 @@
+######################
+### User Variables ###
+######################
+# Comment to disable
+
+packages=(
+    acpilight
+    alacritty
+    brave-bin
+    flameshot
+    gammastep
+    lutris steam wine-staging winetricks
+    materia-{gtk-theme,kde}  papirus-icon-theme
+    network-manager-applet
+    noisetorch-bin
+    noto-fonts{,-cjk,-emoji} otf-font-awesome ttf-{dejavu,liberation}
+    pcmanfm xarchiver
+    pipewire{,-pulse} pavucontrol playerctl
+    polkit-gnome
+    qemu dnsmasq edk2-ovmf iptables-nft virt-manager
+    shellcheck-bin
+    sway{,idle,lock} waybar
+    wl-clipboard
+)

@@ -105,13 +105,10 @@ if lspci | grep "NVIDIA"; then
     $SED "s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
     nvidia-xconfig
 elif lspci | grep "Radeon"; then
-    $PACMAN xf86-video-amdgpu
     $SED "s/^MODULES=(/MODULES=(amdgpu/" /etc/mkinitcpio.conf
 fi
 
 ###########
 ### END ###
 ###########
-[ "$rm_script" ] && rm -rfv "$(pwd)"
-
 echo -e "${BOLD}${GREEN}DONE. Ctrl+D, umount -R /mnt and reboot${NORMAL}"

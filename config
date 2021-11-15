@@ -20,8 +20,6 @@ omz='1'
 
 btl_opt='default arch\ntimeout 3\neditor  no'
 
-#rm_script='1'
-
 pkg=(
     base-devel linux-headers
     git

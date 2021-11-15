@@ -7,6 +7,7 @@ packages=(
     acpilight
     alacritty
     brave-bin
+    dmenu
     flameshot
     gammastep
     lutris steam wine-staging winetricks

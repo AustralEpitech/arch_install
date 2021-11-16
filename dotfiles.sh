@@ -9,11 +9,12 @@ select opt in public private; do
     if [ "$opt" == public ]; then
         repo="$public_repo"
     fi
+    break;
 done
 
 git clone --bare "$repo" "$HOME"/.dotfiles
 
-while [ $config checkout != 0 ]; do
+while ! $config checkout; do
     echo "Please remove conflicted files and press enter:"
     read -r
 done

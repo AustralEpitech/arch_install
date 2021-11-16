@@ -2,13 +2,12 @@
 
 source ./config
 
-CP='sudo cp -rfv'
-
-BOLD='\033[1m'
-NORMAL='\033[0m'
+NORMAL="\033[0m"
+BOLD="\033[1m"
+GREEN="\033[32m"
 
 if [ "$EUID" = 0 ]; then
-    echo 'This script cannot be run as root'
+    echo "This script cannot be run as root"
     exit 1
 fi
 
@@ -17,4 +16,7 @@ fi
 ################
 paru --noconfirm --needed -Syu "${packages[*]}"
 
-#TODO: SSH config
+###########
+### END ###
+###########
+echo -e "${BOLD}${GREEN}DONE.${NORMAL}"

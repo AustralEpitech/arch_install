@@ -23,3 +23,8 @@ If you want a post install script, login as a normal user and run (replace *desk
 ```
 ./desktopEnvironment/install.sh
 ```
+
+For the dotfiles, run:
+```
+./dotfiles.sh
+```

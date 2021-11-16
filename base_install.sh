@@ -2,16 +2,16 @@
 
 source ./config
 
-BOLD='\033[1m'
-GREEN='\033[32m'
-NORMAL='\033[0m'
+NORMAL="\033[0m"
+BOLD="\033[1m"
+GREEN="\033[32m"
 
-CP='cp -fv'
-SED='sed -i'
+CP="cp -fv"
+SED="sed -i"
 SU="su $username -c"
-PACMAN='pacman --noconfirm --needed -Syu'
+PACMAN="pacman --noconfirm --needed -Syu"
 
-boot_entries='/boot/loader/entries'
+boot_entries="/boot/loader/entries"
 
 #############
 ### Clock ###
@@ -23,7 +23,7 @@ timedatectl set-ntp true
 ##############
 ### Locale ###
 ##############
-for i in ${locales[*]}; do
+for i in "${locales[@]}"; do
     $SED "s/^#$i/$i/" /etc/locale.gen
 done
 locale-gen
@@ -47,23 +47,23 @@ zsh_path="$(which zsh)"
 echo "root:$root_passwd" | chpasswd
 
 if [ -n "$zsh_path" ]; then
-    useradd -mG wheel "$username" -s "$zsh_path"
-    $SU 'yes yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+    useradd -mG wheel,video "$username" -s "$zsh_path"
+    $SU 'yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
 else
-    useradd -mG wheel "$username"
+    useradd -mG wheel,video "$username"
 fi
 
 echo "$username:$user_passwd" | chpasswd
 
-$SED 's/^# %wheel ALL=(ALL) ALL$/%wheel ALL=(ALL) ALL/' /etc/sudoers
+$SED "s/^# %wheel ALL=(ALL) ALL$/%wheel ALL=(ALL) ALL/" /etc/sudoers
 
 ###########
 ### AUR ###
 ###########
 mv /etc/sudoers /etc/sudoers.bak
-echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers
+echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers
 
-$SU 'git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm'
+$SU "git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm"
 
 [ "$tech_install" ] && $SU "paru --no-confirm --needed -S ${tech_pkg[*]}"
 
@@ -75,7 +75,7 @@ mv /etc/sudoers.bak /etc/sudoers
 bootctl install
 mkdir -p /etc/pacman.d/hooks && $CP etc/pacman.d/hooks/100-systemd-boot.hook /etc/pacman.d/hooks/
 echo -e "$btl_opt" > /boot/loader/loader.conf
-echo -e 'title   Arch Linux\nlinux   /vmlinuz-linux\ninitrd  /initramfs-linux.img' > "$boot_entries"/arch.conf
+echo -e "title   Arch Linux\nlinux   /vmlinuz-linux\ninitrd  /initramfs-linux.img" > "$boot_entries"/arch.conf
 
 if lscpu | grep -q GenuineIntel; then
     $PACMAN intel-ucode
@@ -85,16 +85,22 @@ elif lscpu | grep -q AuthenticAMD; then
     echo "initrd  /amd-ucode.img" >> "$boot_entries"/arch.conf
 fi
 
-echo "options root=$(lsblk -p --list | awk '$7 == "/" {print $1}')" >> "$boot_entries"/arch.conf
+DISKNAME="$(lsblk --list | awk '$7 == "/" {print $1}')"
+if lsblk | grep crypt; then
+    UUID="$(blkid | awk "\$1 == \"/dev/mapper/$DISKNAME:\" {print \$2}")"
+    echo "options cryptdevice=$UUID:$DISKNAME root=/dev/mapper/$DISKNAME" >> "$boot_entries"/arch.conf
+else
+    echo "options root=$DISKNAME" >> "$boot_entries"/arch.conf
+fi
 
 $CP "$boot_entries"/arch.conf "$boot_entries"/arch-fallback.conf
-$SED 's/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/' "$boot_entries"/arch-fallback.conf
+$SED "s/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/" "$boot_entries"/arch-fallback.conf
 
-###############
-### Network ###
-###############
-$PACMAN networkmanager
+################
+### Services ###
+################
 systemctl enable NetworkManager
+systemctl enable tlp
 
 ###########
 ### GPU ###

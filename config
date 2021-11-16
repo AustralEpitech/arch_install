@@ -3,43 +3,46 @@
 ######################
 # Comment to disable
 
-username='ange'
-user_passwd='sdfg'
+username="ange"
+user_passwd="sdfg"
 root_passwd="$user_passwd"
 
 hostname="${username^^}-PC"
 
-tz='Europe/Paris'
+tz="Europe/Paris"
 locales=(
-    'en_US.UTF-8 UTF-8'
+    "en_US.UTF-8 UTF-8"
 )
 lang="en_US.UTF-8"
 
-omz='1'
-#tech_install='1'
+omz="1"
+#tech_install="1"
 
-btl_opt='default arch\ntimeout 3\neditor  no'
+btl_opt="default arch\ntimeout 3\neditor  no"
 
 pkg=(
     base-devel linux-headers
+    bat
     git
     htop
     man-{db,pages}
     neofetch
-    terminus-font
+    networkmanager
     openssh
+    p7zip unrar unzip
     ranger
     reflector
+    terminus-font
+    tlp
     tree
-    unrar unzip zip
     vim
     wget
     zsh
 )
 
 tech_pkg=(
-    csfml
     criterion
+    csfml
     docker
     gcovr
     gdb

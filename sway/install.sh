@@ -14,7 +14,7 @@ fi
 ################
 ### Packages ###
 ################
-paru --noconfirm --needed -Syu "${packages[*]}"
+paru --noconfirm --needed -Syu "${packages[@]}"
 
 ###########
 ### END ###

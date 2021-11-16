@@ -87,8 +87,11 @@ fi
 
 DISKNAME="$(lsblk --list | awk '$7 == "/" {print $1}')"
 if lsblk | grep crypt; then
-    UUID="$(blkid | awk "\$1 == \"/dev/mapper/$DISKNAME:\" {print \$2}")"
+    PARTNAME="$(cryptsetup status "$DISKNAME" | awk '$1 == "device:" {print $2}')"
+    UUID="$(blkid | awk "\$1 == \"$PARTNAME:\" {print \$2}")"
     echo "options cryptdevice=$UUID:$DISKNAME root=/dev/mapper/$DISKNAME" >> "$boot_entries"/arch.conf
+    HOOKS_LN="$(awk '/^HOOKS=\(/ {print FNR}' /etc/mkinitcpio.conf)"
+    $SED "${HOOKS_LN}s/filesystems/encrypt filesystems/" /etc/mkinitcpio.conf
 else
     echo "options root=$DISKNAME" >> "$boot_entries"/arch.conf
 fi
@@ -113,6 +116,11 @@ if lspci | grep "NVIDIA"; then
 elif lspci | grep "Radeon"; then
     $SED "s/^MODULES=(/MODULES=(amdgpu/" /etc/mkinitcpio.conf
 fi
+
+#########################
+### Rebuild initramfs ###
+#########################
+mkinitcpio -P
 
 ###########
 ### END ###

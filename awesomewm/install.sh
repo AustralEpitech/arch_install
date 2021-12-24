@@ -2,7 +2,7 @@
 
 source ./config
 
-CP="sudo cp -rfv"
+CP="sudo cp -frv"
 
 NORMAL="\033[0m"
 BOLD="\033[1m"

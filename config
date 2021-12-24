@@ -28,6 +28,7 @@ pkg=(
     man-{db,pages}
     neofetch
     networkmanager
+    nvim
     openssh
     p7zip unrar unzip
     ranger
@@ -35,7 +36,6 @@ pkg=(
     terminus-font
     tlp
     tree
-    vim
     wget
     zsh
 )

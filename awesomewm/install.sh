@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+set -e
 source ./config
 
 CP="sudo cp -frv"
@@ -16,7 +17,7 @@ fi
 ################
 ### Packages ###
 ################
-paru --noconfirm --needed -Syu "${packages[@]}"
+paru --needed -Syu "${packages[@]}"
 
 ############
 ### Xorg ###

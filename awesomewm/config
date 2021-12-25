@@ -22,5 +22,5 @@ packages=(
     qemu dnsmasq edk2-ovmf iptables-nft virt-manager
     redshift
     shellcheck-bin
-    xorg-{server,xinit} xclip xdotool
+    xorg-{server,xinit} xclip
 )

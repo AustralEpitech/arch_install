@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+set -e
 source ./config
 
 NORMAL="\033[0m"
@@ -9,7 +10,7 @@ GREEN="\033[32m"
 CP="cp -fv"
 SED="sed -i"
 SU="su $username -c"
-PACMAN="pacman --noconfirm --needed -Syu"
+PACMAN="pacman --needed -Syu"
 
 boot_entries="/boot/loader/entries"
 
@@ -65,7 +66,7 @@ echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers
 
 $SU "git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && cd /tmp/paru-bin && makepkg -si --noconfirm"
 
-[ "$tech_install" ] && $SU "paru --no-confirm --needed -S ${tech_pkg[*]}"
+[ "$tech_install" ] && $SU "paru --needed -S ${tech_pkg[*]}"
 
 mv /etc/sudoers.bak /etc/sudoers
 

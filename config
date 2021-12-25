@@ -18,7 +18,7 @@ lang="en_US.UTF-8"
 omz="1"
 #tech_install="1"
 
-btl_opt="default arch\ntimeout 3\neditor  no"
+btl_opt="default arch"
 
 pkg=(
     base-devel linux-headers
@@ -27,8 +27,8 @@ pkg=(
     htop
     man-{db,pages}
     neofetch
+    neovim
     networkmanager
-    nvim
     openssh
     p7zip unrar unzip
     ranger

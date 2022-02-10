@@ -17,6 +17,9 @@ fi
 ################
 ### Packages ###
 ################
+if lspci | grep "Radeon"; then
+    packages=(${packages[@]} xf86-video-amdgpu)
+fi
 paru --needed -Syu "${packages[@]}"
 
 ############

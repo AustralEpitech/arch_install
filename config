@@ -4,7 +4,7 @@
 # Comment to disable
 
 username="ange"
-user_passwd="sdfg"
+user_passwd="0000"
 root_passwd="$user_passwd"
 
 hostname="${username^^}-PC"
@@ -12,20 +12,25 @@ hostname="${username^^}-PC"
 tz="Europe/Paris"
 locales=(
     "en_US.UTF-8 UTF-8"
+    "fr_FR.UTF-8 UTF-8"
 )
-lang="en_US.UTF-8"
+lang="${locales[0]% *}"
 
 omz="1"
 #tech_install="1"
 
-btl_opt="default arch"
+cpu="$(lscpu | grep "Vendor")"
+gpu="$(lspci | grep "Display controller")"
+esp="$(lsblk -o NAME,FSTYPE,MOUNTPOINTS --list | awk '$2 == "vfat" && $3 ~ "/boot" {print $3}')"
 
 pkg=(
     base-devel linux-headers
     bat
     git
+    grub efibootmgr os-prober
     htop
     man-{db,pages}
+    mpv
     neofetch
     neovim
     networkmanager
@@ -46,5 +51,6 @@ tech_pkg=(
     docker
     gcovr
     gdb
+    sfml
     valgrind
 )

@@ -12,8 +12,6 @@ SED="sed -i"
 SU="su $username -c"
 PACMAN="pacman --needed -Syu"
 
-boot_entries="/boot/loader/entries"
-
 #############
 ### Clock ###
 #############
@@ -47,11 +45,11 @@ ${PACMAN} "${pkg[@]}"
 zsh_path="$(which zsh)"
 echo "root:$root_passwd" | chpasswd
 
-if [ -n "$zsh_path" ]; then
-    useradd -mG wheel,video "$username" -s "$zsh_path"
+if [ "$zsh_path" ]; then
+    useradd -mG wheel "$username" -s "$zsh_path"
     $SU 'yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
 else
-    useradd -mG wheel,video "$username"
+    useradd -mG wheel "$username"
 fi
 
 echo "$username:$user_passwd" | chpasswd
@@ -73,32 +71,17 @@ mv /etc/sudoers.bak /etc/sudoers
 ##################
 ### Bootloader ###
 ##################
-bootctl install
-mkdir -p /etc/pacman.d/hooks && $CP etc/pacman.d/hooks/100-systemd-boot.hook /etc/pacman.d/hooks/
-echo -e "$btl_opt" > /boot/loader/loader.conf
-echo -e "title   Arch Linux\nlinux   /vmlinuz-linux\ninitrd  /initramfs-linux.img" > "$boot_entries"/arch.conf
+case "$gpu" in
+    *AuthenticAMD*)
+        $PACMAN amd-ucode
+        ;;
+    *GenuineIntel*)
+        $PACMAN intel-ucode
+        ;;
+esac
 
-if lscpu | grep -q GenuineIntel; then
-    $PACMAN intel-ucode
-    echo "initrd  /intel-ucode.img" >> "$boot_entries"/arch.conf
-elif lscpu | grep -q AuthenticAMD; then
-    $PACMAN amd-ucode
-    echo "initrd  /amd-ucode.img" >> "$boot_entries"/arch.conf
-fi
-
-DISKNAME="$(lsblk --list | awk '$7 == "/" {print $1}')"
-if lsblk | grep crypt; then
-    PARTNAME="$(cryptsetup status "$DISKNAME" | awk '$1 == "device:" {print $2}')"
-    UUID="$(blkid | awk "\$1 == \"$PARTNAME:\" {print \$2}")"
-    echo "options cryptdevice=$UUID:$DISKNAME root=/dev/mapper/$DISKNAME" >> "$boot_entries"/arch.conf
-    HOOKS_LN="$(awk '/^HOOKS=\(/ {print FNR}' /etc/mkinitcpio.conf)"
-    $SED "${HOOKS_LN}s/filesystems/encrypt filesystems/" /etc/mkinitcpio.conf
-else
-    echo "options root=$DISKNAME" >> "$boot_entries"/arch.conf
-fi
-
-$CP "$boot_entries"/arch.conf "$boot_entries"/arch-fallback.conf
-$SED "s/Arch Linux$/Arch Linux (fallback initramfs)/; s/initramfs-linux.img$/initramfs-linux-fallback.img/" "$boot_entries"/arch-fallback.conf
+grub-install --target=x86_64-efi --efi-directory="$esp" --bootloader-id=GRUB
+grub-mkconfig -o /boot/grub/grub.cfg
 
 ################
 ### Services ###
@@ -109,14 +92,16 @@ systemctl enable tlp
 ###########
 ### GPU ###
 ###########
-if lspci | grep "NVIDIA"; then
-    $PACMAN nvidia{,-settings}
-    mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook /etc/pacman.d/hooks
-    $SED "s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
-    nvidia-xconfig
-elif lspci | grep "Radeon"; then
-    $SED "s/^MODULES=(/MODULES=(amdgpu/" /etc/mkinitcpio.conf
-fi
+case "$gpu" in
+    *NVIDIA*)
+        $PACMAN nvidia{,-settings}
+        mkdir /etc/pacman.d/hooks -p && $CP etc/pacman.d/hooks/nvidia.hook /etc/pacman.d/hooks
+        $SED "s/^MODULES=(/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm/" /etc/mkinitcpio.conf
+        ;;
+    *Radeon*)
+        $SED "s/^MODULES=(/MODULES=(amdgpu/" /etc/mkinitcpio.conf
+        ;;
+esac
 
 #########################
 ### Rebuild initramfs ###

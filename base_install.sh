@@ -86,8 +86,13 @@ grub-mkconfig -o /boot/grub/grub.cfg
 ################
 ### Services ###
 ################
+set +e
 systemctl enable NetworkManager
+systemctl enable cups.socket
+systemctl enable docker.socket
+systemctl enable libvirtd.socket
 systemctl enable tlp
+set -e
 
 ###########
 ### GPU ###
